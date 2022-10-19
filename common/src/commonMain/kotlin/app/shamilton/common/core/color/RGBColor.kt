@@ -1,5 +1,6 @@
 package app.shamilton.common.core.color
 
+import app.shamilton.common.core.Util
 import kotlin.math.max
 import kotlin.math.min
 
@@ -10,32 +11,13 @@ import kotlin.math.min
  * @param b Blue, 0 - 255
  */
 data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
-    /**
-     * Maps all possible Ints to a hex Char
-     * All Chars are uppercase
-     */
-    private val digitToHex = mapOf(
-        0 to '0',
-        1 to '1',
-        2 to '2',
-        3 to '3',
-        4 to '4',
-        5 to '5',
-        6 to '6',
-        7 to '7',
-        8 to '8',
-        9 to '9',
-        10 to 'A',
-        11 to 'B',
-        12 to 'C',
-        13 to 'D',
-        14 to 'E',
-        15 to 'F',
-    )
+
+    constructor(rgb: RGBColor): this(rgb.r, rgb.g, rgb.b)
 
     /**
-     * Converts this RGB to HSV
+     * Converts this RGBColor to HSVColor
      * Source: https://stackoverflow.com/a/6930407
+     * @return An HSVColor
      */
     fun toHSV(): HSVColor {
         // This code will be expecting r, g, and b to be 0 - 1
@@ -94,8 +76,8 @@ data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
         if(decimal > 255 || decimal < 0) throw IllegalArgumentException()
 
         var hex = ""
-        hex += digitToHex[decimal % 16]
-        hex += digitToHex[decimal / 16 % 16]
+        hex += Util.decimalToHex[decimal / 16 % 16]
+        hex += Util.decimalToHex[decimal % 16]
         return hex
     }
 
@@ -103,10 +85,10 @@ data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
      * Converts this RGBColor to a hexadecimal string
      * @return A hexadecimal string starting with #
      */
-    fun toHEX(): String {
+    fun toHEX(): HEXColor {
         val rHex = decimalToHex(r)
         val gHex = decimalToHex(g)
         val bHex = decimalToHex(b)
-        return "#$rHex$gHex$bHex"
+        return HEXColor(rHex, gHex, bHex)
     }
 }

@@ -1,5 +1,7 @@
 package app.shamilton.common.core.color
 
+import kotlin.math.round
+
 /**
  * A representation of a color in hue, saturation, and brightness (value)
  * @param h Hue, 0.0 - 1.0
@@ -7,17 +9,21 @@ package app.shamilton.common.core.color
  * @param v Brightness (Value), 0.0 - 1.0
  */
 data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.0) {
+
+    constructor(hsv: HSVColor): this(hsv.h, hsv.s, hsv.v)
+
     /**
-     * Converts this HSV to RGB
+     * Converts this HSVColor to an RGBColor
      * Source: https://stackoverflow.com/a/6930407
+     * @return An RGBColor
      */
     fun toRGB(): RGBColor {
         val out = RGBColor()
 
         if(s <= 0.0) {       // < is bogus, just shuts up warnings
-            out.r = v.toInt() * 255
-            out.g = v.toInt() * 255
-            out.b = v.toInt() * 255
+            out.r = (v * 255.0).toInt()
+            out.g = (v * 255.0).toInt()
+            out.b = (v * 255.0).toInt()
             return out
         }
         var hh: Double = h * 360
@@ -31,44 +37,44 @@ data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.
 
         when(i) {
             0L -> {
-                out.r = v.toInt() * 255
-                out.g = t.toInt() * 255
-                out.b = p.toInt() * 255
+                out.r = round(v * 255.0).toInt()
+                out.g = round(t * 255.0).toInt()
+                out.b = round(p * 255.0).toInt()
             }
             1L -> {
-                out.r = q.toInt() * 255
-                out.g = v.toInt() * 255
-                out.b = p.toInt() * 255
+                out.r = round(q * 255.0).toInt()
+                out.g = round(v * 255.0).toInt()
+                out.b = round(p * 255.0).toInt()
             }
             2L -> {
-                out.r = p.toInt() * 255
-                out.g = v.toInt() * 255
-                out.b = t.toInt() * 255
+                out.r = round(p * 255.0).toInt()
+                out.g = round(v * 255.0).toInt()
+                out.b = round(t * 255.0).toInt()
             }
             3L -> {
-                out.r = p.toInt() * 255
-                out.g = q.toInt() * 255
-                out.b = v.toInt() * 255
+                out.r = round(p * 255.0).toInt()
+                out.g = round(q * 255.0).toInt()
+                out.b = round(v * 255.0).toInt()
             }
             4L -> {
-                out.r = t.toInt() * 255
-                out.g = p.toInt() * 255
-                out.b = v.toInt() * 255
+                out.r = round(t * 255.0).toInt()
+                out.g = round(p * 255.0).toInt()
+                out.b = round(v * 255.0).toInt()
             }
             else -> {
-                out.r = v.toInt() * 255
-                out.g = p.toInt() * 255
-                out.b = q.toInt() * 255
+                out.r = round(v * 255.0).toInt()
+                out.g = round(p * 255.0).toInt()
+                out.b = round(q * 255.0).toInt()
             }
         }
         return out
     }
 
     /**
-     * Converts this HSVColor to a hexadecimal string
-     * @return A hexadecimal string starting with #
+     * Converts this HSVColor to a HEXColor
+     * @return A HEXColor
      */
-    fun toHEX(): String {
+    fun toHEX(): HEXColor {
         return toRGB().toHEX()
     }
 }

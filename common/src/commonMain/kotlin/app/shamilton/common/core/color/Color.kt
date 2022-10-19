@@ -4,38 +4,26 @@ package app.shamilton.common.core.color
  * A representation of a color using RGB, HSV, or HEX
  */
 class Color() {
-    /**
-     * Maps all possible Chars for Hex to an Int
-     * All letters are uppercase
-     */
-    private val hexToDecimal = mapOf(
-        '0' to 0,
-        '1' to 1,
-        '2' to 2,
-        '3' to 3,
-        '4' to 4,
-        '5' to 5,
-        '6' to 6,
-        '7' to 7,
-        '8' to 8,
-        '9' to 9,
-        'A' to 10,
-        'B' to 11,
-        'C' to 12,
-        'D' to 13,
-        'E' to 14,
-        'F' to 15,
-    )
 
     /**
      * The RGB representation of this color
+     * If you wish to change the rgb color, use this Color's r, g, and b values
      */
     var rgb = RGBColor()
         private set
+
     /**
      * The HSV representation of this color
+     * If you wish to change the hsv color, use this Color's h, s, and v values
      */
     var hsv = HSVColor()
+        private set
+
+    /**
+     * The HEXadecimal representation of this color
+     * If you wish to change the hex color, use this Color's hexR, hexG, and hexB values
+     */
+    var hex = HEXColor()
         private set
 
     /**
@@ -47,6 +35,7 @@ class Color() {
         set(value) {
             rgb.r = value
             hsv = rgb.toHSV()
+            hex = rgb.toHEX()
         }
     /**
      * The Green value of this color
@@ -57,6 +46,7 @@ class Color() {
         set(value) {
             rgb.g = value
             hsv = rgb.toHSV()
+            hex = rgb.toHEX()
         }
     /**
      * The Blue value of this color
@@ -67,6 +57,7 @@ class Color() {
         set(value) {
             rgb.b = value
             hsv = rgb.toHSV()
+            hex = rgb.toHEX()
         }
 
     /**
@@ -78,6 +69,7 @@ class Color() {
         set(value) {
             hsv.h = value
             rgb = hsv.toRGB()
+            hex = rgb.toHEX()
         }
     /**
      * The Saturation value of this color
@@ -88,6 +80,7 @@ class Color() {
         set(value) {
             hsv.s = value
             rgb = hsv.toRGB()
+            hex = rgb.toHEX()
         }
     /**
      * The Brightness (Value) value of this color
@@ -98,6 +91,31 @@ class Color() {
         set(value) {
             hsv.v = value
             rgb = hsv.toRGB()
+            hex = rgb.toHEX()
+        }
+
+    var hexR: String
+        get() = hex.r
+        set(value) {
+            hex.r = value
+            rgb = hex.toRGB()
+            hsv = rgb.toHSV()
+        }
+
+    var hexG: String
+        get() = hex.g
+        set(value) {
+            hex.g = value
+            rgb = hex.toRGB()
+            hsv = rgb.toHSV()
+        }
+
+    var hexB: String
+        get() = hex.b
+        set(value) {
+            hex.b = value
+            rgb = hex.toRGB()
+            hsv = rgb.toHSV()
         }
 
     /**
@@ -106,6 +124,7 @@ class Color() {
      */
     constructor(color: Color): this() {
         rgb = RGBColor(color.r, color.g, color.b)
+        hex = HEXColor(color.hexR, color.hexG, color.hexB)
         hsv = HSVColor(color.h, color.s, color.v)
     }
 
@@ -117,6 +136,7 @@ class Color() {
      */
     constructor(r: Int, g: Int, b: Int): this() {
         rgb = RGBColor(r, g, b)
+        hex = rgb.toHEX()
         hsv = rgb.toHSV()
     }
     
@@ -135,6 +155,7 @@ class Color() {
     constructor(h: Double, s: Double, v: Double): this() {
         hsv = HSVColor(h, s, v)
         rgb = hsv.toRGB()
+        hex = rgb.toHEX()
     }
 
     /**
@@ -145,41 +166,20 @@ class Color() {
 
     /**
      * Creates a Color from a Hexadecimal string
-     * @param hex The Hex color in HTML format (e.g. #FF7F00)
+     * @param hexString The Hex color in HTML format (e.g. #FF7F00)
      * @throws IllegalArgumentException if the Hex string is not 7 characters long or is not in the format of "#000000"
      */
-    constructor(hex: String): this() {
-        // Sanity checks
-        if(hex.length != 7) throw IllegalArgumentException("Hex strings must be 7 characters long.")
-        for((i, char) in hex.withIndex()) {
-            if(i == 0 && char != '#') {
-                throw IllegalArgumentException("First Hex character must be '#'")
-            } else if(!hexToDecimal.containsKey(char)) {
-                throw IllegalArgumentException("Unexpected character in Hex string. Must be 0-9 or A-F")
-            }
-        }
-
-        val rTens = hex[1]
-        val rOnes = hex[2]
-        val r = hexToDecimal[rTens]!! * 16 + hexToDecimal[rOnes]!!
-        val gTens = hex[3]
-        val gOnes = hex[4]
-        val g = hexToDecimal[gTens]!! * 16 + hexToDecimal[gOnes]!!
-        val bTens = hex[5]
-        val bOnes = hex[6]
-        val b = hexToDecimal[bTens]!! * 16 + hexToDecimal[bOnes]!!
-
-        rgb = RGBColor(r, g, b)
+    constructor(hexString: String): this() {
+        hex = HEXColor(hexString)
+        rgb = hex.toRGB()
         hsv = rgb.toHSV()
     }
 
     /**
-     * Converts this Color to a Hex string
-     * @return A Hexadecimal string
+     * Creates a Color from a HEXColor
+     * @param hex The HEXColor to create a Color from
      */
-    fun toHEX(): String {
-        return rgb.toHEX()
-    }
+    constructor(hex: HEXColor): this(hex.toString())
 
     companion object {
         val BLACK = Color(0, 0, 0)
@@ -196,4 +196,7 @@ class Color() {
         val WHITE = Color(255, 255, 255)
         val YELLOW = Color(255, 255, 0)
     }
+
+    override fun equals(other: Any?): Boolean = other is Color && rgb == other.rgb
+    override fun hashCode(): Int = rgb.hashCode()
 }
