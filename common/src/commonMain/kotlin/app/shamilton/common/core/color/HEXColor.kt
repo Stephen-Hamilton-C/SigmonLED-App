@@ -2,6 +2,7 @@ package app.shamilton.common.core.color
 
 import app.shamilton.common.core.Util
 
+// TODO: Documentation pass
 class HEXColor() {
 
     constructor(red: String, green: String, blue: String) : this() {
