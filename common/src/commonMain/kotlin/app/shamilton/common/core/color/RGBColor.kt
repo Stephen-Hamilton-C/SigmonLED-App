@@ -4,11 +4,16 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
+ * A representation of a color in red, green, and blue
  * @param r Red, 0 - 255
  * @param g Green, 0 - 255
  * @param b Blue, 0 - 255
  */
 data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
+    /**
+     * Maps all possible Ints to a hex Char
+     * All Chars are uppercase
+     */
     private val digitToHex = mapOf(
         0 to '0',
         1 to '1',

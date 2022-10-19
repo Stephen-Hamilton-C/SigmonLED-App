@@ -1,9 +1,10 @@
 package app.shamilton.common.core.color
 
 /**
- * @param h Hue, 0 - 1
- * @param s Saturation, 0 - 1
- * @param v Value, 0 - 1
+ * A representation of a color in hue, saturation, and brightness (value)
+ * @param h Hue, 0.0 - 1.0
+ * @param s Saturation, 0.0 - 1.0
+ * @param v Brightness (Value), 0.0 - 1.0
  */
 data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.0) {
     /**
