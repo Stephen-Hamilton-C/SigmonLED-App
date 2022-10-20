@@ -12,6 +12,9 @@ import kotlin.math.min
  */
 data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
 
+    /**
+     * Creates a copy of the given RGBColor
+     */
     constructor(rgb: RGBColor): this(rgb.r, rgb.g, rgb.b)
 
     /**

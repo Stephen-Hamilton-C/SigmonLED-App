@@ -10,6 +10,9 @@ import kotlin.math.round
  */
 data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.0) {
 
+    /**
+     * Creates a copy of the given HSVColor
+     */
     constructor(hsv: HSVColor): this(hsv.h, hsv.s, hsv.v)
 
     /**
