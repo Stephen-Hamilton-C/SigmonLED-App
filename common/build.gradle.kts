@@ -22,17 +22,22 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation("com.badoo.reaktive:reaktive:1.2.2")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                // Somehow, this causes issues. Will have to look into it later.
+                // implementation("com.badoo.reaktive:reaktive-testing:1.2.2")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("androidx.appcompat:appcompat:1.2.0")
                 api("androidx.core:core-ktx:1.3.1")
+                // Potential bluetooth libraries for Android:
+                // https://github.com/VincentMasselis/RxBluetoothKotlin - This one would likely need that Reaktive RxJava3 interop package
             }
         }
         val androidTest by getting {
@@ -43,6 +48,8 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 api(compose.preview)
+                // Potential bluetooth libraries for Desktop:
+                // https://github.com/sputnikdev/bluetooth-manager
             }
         }
         val desktopTest by getting
