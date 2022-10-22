@@ -1,6 +1,6 @@
 package app.shamilton.common.core.color
 
-import app.shamilton.common.core.Util
+import app.shamilton.common.core.toHex
 import kotlin.math.max
 import kotlin.math.min
 
@@ -71,27 +71,10 @@ data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
     }
 
     /**
-     * Converts a decimal number to a two digit hexadecimal
-     * @param decimal The decimal number from 0 to 255 inclusive
-     * @throws IllegalArgumentException if decimal is not within the inclusive range 0 - 255
-     */
-    private fun decimalToHex(decimal: Int): String {
-        if(decimal > 255 || decimal < 0) throw IllegalArgumentException()
-
-        var hex = ""
-        hex += Util.decimalToHex[decimal / 16 % 16]
-        hex += Util.decimalToHex[decimal % 16]
-        return hex
-    }
-
-    /**
-     * Converts this RGBColor to a hexadecimal string
-     * @return A hexadecimal string starting with #
+     * Converts this RGBColor to a HEXColor
+     * @return A HEXColor
      */
     fun toHEX(): HEXColor {
-        val rHex = decimalToHex(r)
-        val gHex = decimalToHex(g)
-        val bHex = decimalToHex(b)
-        return HEXColor(rHex, gHex, bHex)
+        return HEXColor(r.toHex(), g.toHex(), b.toHex())
     }
 }
