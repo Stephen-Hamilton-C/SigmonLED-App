@@ -1,4 +1,4 @@
-package app.shamilton.common.core
+package app.shamilton.common.core.palette
 
 import app.shamilton.common.core.color.Color
 
