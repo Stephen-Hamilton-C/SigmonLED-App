@@ -1,4 +1,4 @@
-package app.shamilton.common.core
+package app.shamilton.sigmonled_app.core
 
 object Util {
     /**

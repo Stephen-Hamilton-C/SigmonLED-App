@@ -1,6 +1,6 @@
-package app.shamilton.common.core.color
+package app.shamilton.sigmonled_app.core.color
 
-import app.shamilton.common.core.toHex
+import app.shamilton.sigmonled_app.core.toHex
 import kotlin.math.max
 import kotlin.math.min
 

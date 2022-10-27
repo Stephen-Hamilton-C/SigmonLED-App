@@ -1,4 +1,4 @@
-package app.shamilton.common.core.palette
+package app.shamilton.sigmonled_app.core.palette
 
 enum class DefaultPalette(val value: Char) {
     RAINBOW('r'),

@@ -1,6 +1,6 @@
-package app.shamilton.common.core.color
+package app.shamilton.sigmonled_app.core.color
 
-import app.shamilton.common.core.Util
+import app.shamilton.sigmonled_app.core.Util
 
 /**
  * A representation of a color in red, green, and blue as hexadecimal characters.

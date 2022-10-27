@@ -1,11 +1,11 @@
-package app.shamilton.common.core
+package app.shamilton.sigmonled_app.core
 
 import app.shamilton.sigmonled_app.core.bluetooth.DeviceManager
-import app.shamilton.common.core.color.Color
-import app.shamilton.common.core.color.HEXColor
-import app.shamilton.common.core.palette.DefaultPalette
-import app.shamilton.common.core.palette.Palette
-import app.shamilton.common.core.palette.PaletteConfig
+import app.shamilton.sigmonled_app.core.color.Color
+import app.shamilton.sigmonled_app.core.color.HEXColor
+import app.shamilton.sigmonled_app.core.palette.DefaultPalette
+import app.shamilton.sigmonled_app.core.palette.Palette
+import app.shamilton.sigmonled_app.core.palette.PaletteConfig
 
 object ArduinoCommander {
     fun setPalette(palette: Palette, config: PaletteConfig) {

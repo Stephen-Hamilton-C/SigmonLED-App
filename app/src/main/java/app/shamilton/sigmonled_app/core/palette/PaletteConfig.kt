@@ -1,4 +1,4 @@
-package app.shamilton.common.core.palette
+package app.shamilton.sigmonled_app.core.palette
 
 /**
  * Configuration for Palette mode

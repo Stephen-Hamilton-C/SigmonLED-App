@@ -1,4 +1,4 @@
-package app.shamilton.common.core.color
+package app.shamilton.sigmonled_app.core.color
 
 /**
  * A representation of a color using RGB, HSV, or HEX
