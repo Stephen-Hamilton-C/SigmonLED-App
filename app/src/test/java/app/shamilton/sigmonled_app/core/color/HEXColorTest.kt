@@ -1,4 +1,4 @@
-package app.shamilton.common.core.color
+package app.shamilton.sigmonled_app.core.color
 
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -7,111 +7,111 @@ import kotlin.test.assertFailsWith
 
 class HEXColorTest {
 
-    private var BLACK = HEXColor()
-    private var BLUE = HEXColor()
-    private var CYAN = HEXColor()
-    private var DARK_GRAY = HEXColor()
-    private var ORANGE = HEXColor()
-    private var PINK = HEXColor()
-    private var RED = HEXColor()
-    private var WHITE = HEXColor()
+    private var black = HEXColor()
+    private var blue = HEXColor()
+    private var cyan = HEXColor()
+    private var darkGray = HEXColor()
+    private var orange = HEXColor()
+    private var pink = HEXColor()
+    private var red = HEXColor()
+    private var white = HEXColor()
 
     @BeforeTest fun setup() {
-        BLACK = HEXColor("#000000")
-        BLUE = HEXColor("#0000FF")
-        CYAN = HEXColor("#00FFFF")
-        DARK_GRAY = HEXColor("#404040")
-        ORANGE = HEXColor("#FFC800")
-        PINK = HEXColor("#FFAFAF")
-        RED = HEXColor("#FF0000")
-        WHITE = HEXColor("#FFFFFF")
+        black = HEXColor("#000000")
+        blue = HEXColor("#0000FF")
+        cyan = HEXColor("#00FFFF")
+        darkGray = HEXColor("#404040")
+        orange = HEXColor("#FFC800")
+        pink = HEXColor("#FFAFAF")
+        red = HEXColor("#FF0000")
+        white = HEXColor("#FFFFFF")
     }
 
     @Test fun testIndividualConstructor() {
-        assertEquals(BLACK, HEXColor("00", "00", "00"))
-        assertEquals(BLUE, HEXColor("00", "00", "FF"))
-        assertEquals(CYAN, HEXColor("00", "FF", "FF"))
-        assertEquals(DARK_GRAY, HEXColor("40", "40", "40"))
-        assertEquals(ORANGE, HEXColor("FF", "C8", "00"))
-        assertEquals(PINK, HEXColor("FF", "AF", "AF"))
-        assertEquals(RED, HEXColor("FF", "00", "00"))
-        assertEquals(WHITE, HEXColor("FF", "FF", "FF"))
+        assertEquals(black, HEXColor("00", "00", "00"))
+        assertEquals(blue, HEXColor("00", "00", "FF"))
+        assertEquals(cyan, HEXColor("00", "FF", "FF"))
+        assertEquals(darkGray, HEXColor("40", "40", "40"))
+        assertEquals(orange, HEXColor("FF", "C8", "00"))
+        assertEquals(pink, HEXColor("FF", "AF", "AF"))
+        assertEquals(red, HEXColor("FF", "00", "00"))
+        assertEquals(white, HEXColor("FF", "FF", "FF"))
     }
 
     @Test fun testCopyConstructor() {
-        assertEquals(BLACK, HEXColor(BLACK))
-        assertEquals(BLUE, HEXColor(BLUE))
-        assertEquals(CYAN, HEXColor(CYAN))
-        assertEquals(DARK_GRAY, HEXColor(DARK_GRAY))
-        assertEquals(ORANGE, HEXColor(ORANGE))
-        assertEquals(PINK, HEXColor(PINK))
-        assertEquals(RED, HEXColor(RED))
-        assertEquals(WHITE, HEXColor(WHITE))
+        assertEquals(black, HEXColor(black))
+        assertEquals(blue, HEXColor(blue))
+        assertEquals(cyan, HEXColor(cyan))
+        assertEquals(darkGray, HEXColor(darkGray))
+        assertEquals(orange, HEXColor(orange))
+        assertEquals(pink, HEXColor(pink))
+        assertEquals(red, HEXColor(red))
+        assertEquals(white, HEXColor(white))
     }
 
     @Test fun testSetChannels() {
         assertFailsWith<IllegalStateException> {
-            BLACK.r = "000"
+            black.r = "000"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.r = "0"
+            black.r = "0"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.r = "Fl"
+            black.r = "Fl"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.g = "000"
+            black.g = "000"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.g = "0"
+            black.g = "0"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.g = "Fl"
+            black.g = "Fl"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.b = "000"
+            black.b = "000"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.b = "0"
+            black.b = "0"
         }
         assertFailsWith<IllegalStateException> {
-            BLACK.b = "Fl"
+            black.b = "Fl"
         }
-        BLACK.r = "10"
-        BLACK.g = "0F"
-        BLACK.b = "7F"
+        black.r = "10"
+        black.g = "0F"
+        black.b = "7F"
     }
 
     @Test fun testToRGB() {
-        assertEquals(RGBColor(0, 0, 0), BLACK.toRGB())
-        assertEquals(RGBColor(0, 0, 255), BLUE.toRGB())
-        assertEquals(RGBColor(0, 255, 255), CYAN.toRGB())
-        assertEquals(RGBColor(64, 64, 64), DARK_GRAY.toRGB())
-        assertEquals(RGBColor(255, 200, 0), ORANGE.toRGB())
-        assertEquals(RGBColor(255, 175, 175), PINK.toRGB())
-        assertEquals(RGBColor(255, 0, 0), RED.toRGB())
-        assertEquals(RGBColor(255, 255, 255), WHITE.toRGB())
+        assertEquals(RGBColor(0, 0, 0), black.toRGB())
+        assertEquals(RGBColor(0, 0, 255), blue.toRGB())
+        assertEquals(RGBColor(0, 255, 255), cyan.toRGB())
+        assertEquals(RGBColor(64, 64, 64), darkGray.toRGB())
+        assertEquals(RGBColor(255, 200, 0), orange.toRGB())
+        assertEquals(RGBColor(255, 175, 175), pink.toRGB())
+        assertEquals(RGBColor(255, 0, 0), red.toRGB())
+        assertEquals(RGBColor(255, 255, 255), white.toRGB())
     }
 
     @Test fun testToHSV() {
-        assertEquals(HSVColor(0.0, 0.0, 0.0), BLACK.toHSV())
-        assertEquals(HSVColor(240.0/360.0, 1.0, 1.0), BLUE.toHSV())
-        assertEquals(HSVColor(180.0/360.0, 1.0, 1.0), CYAN.toHSV())
-        assertEquals(HSVColor(0.0, 0.0, 64.0/255.0), DARK_GRAY.toHSV())
-        assertEquals(HSVColor(0.130718954248366, 1.0, 1.0), ORANGE.toHSV())
-        assertEquals(HSVColor(0.0, 0.3137254901960784, 1.0), PINK.toHSV())
-        assertEquals(HSVColor(0.0/360.0, 1.0, 1.0), RED.toHSV())
-        assertEquals(HSVColor(0.0/360.0, 0.0, 1.0), WHITE.toHSV())
+        assertEquals(HSVColor(0.0, 0.0, 0.0), black.toHSV())
+        assertEquals(HSVColor(240.0/360.0, 1.0, 1.0), blue.toHSV())
+        assertEquals(HSVColor(180.0/360.0, 1.0, 1.0), cyan.toHSV())
+        assertEquals(HSVColor(0.0, 0.0, 64.0/255.0), darkGray.toHSV())
+        assertEquals(HSVColor(0.130718954248366, 1.0, 1.0), orange.toHSV())
+        assertEquals(HSVColor(0.0, 0.3137254901960784, 1.0), pink.toHSV())
+        assertEquals(HSVColor(0.0/360.0, 1.0, 1.0), red.toHSV())
+        assertEquals(HSVColor(0.0/360.0, 0.0, 1.0), white.toHSV())
     }
 
     @Test fun testToString() {
-        assertEquals("#000000", BLACK.toString())
-        assertEquals("#0000FF", BLUE.toString())
-        assertEquals("#00FFFF", CYAN.toString())
-        assertEquals("#404040", DARK_GRAY.toString())
-        assertEquals("#FFC800", ORANGE.toString())
-        assertEquals("#FFAFAF", PINK.toString())
-        assertEquals("#FF0000", RED.toString())
-        assertEquals("#FFFFFF", WHITE.toString())
+        assertEquals("#000000", black.toString())
+        assertEquals("#0000FF", blue.toString())
+        assertEquals("#00FFFF", cyan.toString())
+        assertEquals("#404040", darkGray.toString())
+        assertEquals("#FFC800", orange.toString())
+        assertEquals("#FFAFAF", pink.toString())
+        assertEquals("#FF0000", red.toString())
+        assertEquals("#FFFFFF", white.toString())
     }
 }

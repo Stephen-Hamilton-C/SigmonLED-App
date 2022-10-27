@@ -1,6 +1,6 @@
-package app.shamilton.common.core.palette
+package app.shamilton.sigmonled_app.core.palette
 
-import app.shamilton.common.core.color.Color
+import app.shamilton.sigmonled_app.core.color.Color
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,11 +1,12 @@
-package app.shamilton.common.core
+package app.shamilton.sigmonled_app.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class IntExtensionsTest {
-    @Test fun testToHex() {
+    @Test
+    fun testToHex() {
         assertEquals("FF", 255.toHex())
         assertEquals("0", 0.toHex())
         assertEquals("7F", 127.toHex())
@@ -16,7 +17,8 @@ class IntExtensionsTest {
         assertEquals("-FF", (-255).toHex())
     }
 
-    @Test fun testToHexPadded() {
+    @Test
+    fun testToHexPadded() {
         assertEquals("FF", 255.toHexPadded(2))
         assertEquals("00", 0.toHexPadded(2))
         assertEquals("007F", 127.toHexPadded(4))

@@ -1,71 +1,71 @@
-package app.shamilton.common.core.color
+package app.shamilton.sigmonled_app.core.color
 
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RGBColorTest() {
-    private var BLACK = RGBColor()
-    private var BLUE = RGBColor()
-    private var CYAN = RGBColor()
-    private var DARK_GRAY = RGBColor()
-    private var ORANGE = RGBColor()
-    private var PINK = RGBColor()
-    private var RED = RGBColor()
-    private var WHITE = RGBColor()
+    private var black = RGBColor()
+    private var blue = RGBColor()
+    private var cyan = RGBColor()
+    private var darkGray = RGBColor()
+    private var orange = RGBColor()
+    private var pink = RGBColor()
+    private var red = RGBColor()
+    private var white = RGBColor()
 
     @BeforeTest fun setup() {
-        BLACK = RGBColor(0, 0, 0)
-        BLUE = RGBColor(0, 0, 255)
-        CYAN = RGBColor(0, 255, 255)
-        DARK_GRAY = RGBColor(64, 64, 64)
-        ORANGE = RGBColor(255, 200, 0)
-        PINK = RGBColor(255, 175, 175)
-        RED = RGBColor(255, 0, 0)
-        WHITE = RGBColor(255, 255, 255)
+        black = RGBColor(0, 0, 0)
+        blue = RGBColor(0, 0, 255)
+        cyan = RGBColor(0, 255, 255)
+        darkGray = RGBColor(64, 64, 64)
+        orange = RGBColor(255, 200, 0)
+        pink = RGBColor(255, 175, 175)
+        red = RGBColor(255, 0, 0)
+        white = RGBColor(255, 255, 255)
     }
 
     @Test fun testCopyConstructor() {
-        assertEquals(BLACK, RGBColor(BLACK))
-        assertEquals(BLUE, RGBColor(BLUE))
-        assertEquals(CYAN, RGBColor(CYAN))
-        assertEquals(DARK_GRAY, RGBColor(DARK_GRAY))
-        assertEquals(ORANGE, RGBColor(ORANGE))
-        assertEquals(PINK, RGBColor(PINK))
-        assertEquals(RED, RGBColor(RED))
-        assertEquals(WHITE, RGBColor(WHITE))
+        assertEquals(black, RGBColor(black))
+        assertEquals(blue, RGBColor(blue))
+        assertEquals(cyan, RGBColor(cyan))
+        assertEquals(darkGray, RGBColor(darkGray))
+        assertEquals(orange, RGBColor(orange))
+        assertEquals(pink, RGBColor(pink))
+        assertEquals(red, RGBColor(red))
+        assertEquals(white, RGBColor(white))
     }
 
     @Test fun testToHSV() {
-        assertEquals(HSVColor(0.0, 0.0, 0.0), BLACK.toHSV())
-        assertEquals(HSVColor(240.0/360.0, 1.0, 1.0), BLUE.toHSV())
-        assertEquals(HSVColor(180.0/360.0, 1.0, 1.0), CYAN.toHSV())
-        assertEquals(HSVColor(0.0, 0.0, 64.0/255.0), DARK_GRAY.toHSV())
-        assertEquals(HSVColor(0.130718954248366, 1.0, 1.0), ORANGE.toHSV())
-        assertEquals(HSVColor(0.0, 0.3137254901960784, 1.0), PINK.toHSV())
-        assertEquals(HSVColor(0.0/360.0, 1.0, 1.0), RED.toHSV())
-        assertEquals(HSVColor(0.0/360.0, 0.0, 1.0), WHITE.toHSV())
+        assertEquals(HSVColor(0.0, 0.0, 0.0), black.toHSV())
+        assertEquals(HSVColor(240.0/360.0, 1.0, 1.0), blue.toHSV())
+        assertEquals(HSVColor(180.0/360.0, 1.0, 1.0), cyan.toHSV())
+        assertEquals(HSVColor(0.0, 0.0, 64.0/255.0), darkGray.toHSV())
+        assertEquals(HSVColor(0.130718954248366, 1.0, 1.0), orange.toHSV())
+        assertEquals(HSVColor(0.0, 0.3137254901960784, 1.0), pink.toHSV())
+        assertEquals(HSVColor(0.0/360.0, 1.0, 1.0), red.toHSV())
+        assertEquals(HSVColor(0.0/360.0, 0.0, 1.0), white.toHSV())
     }
 
     @Test fun testToHEX() {
-        assertEquals(HEXColor("#000000"), BLACK.toHEX())
-        assertEquals(HEXColor("#0000FF"), BLUE.toHEX())
-        assertEquals(HEXColor("#00FFFF"), CYAN.toHEX())
-        assertEquals(HEXColor("#404040"), DARK_GRAY.toHEX())
-        assertEquals(HEXColor("#FFC800"), ORANGE.toHEX())
-        assertEquals(HEXColor("#FFAFAF"), PINK.toHEX())
-        assertEquals(HEXColor("#FF0000"), RED.toHEX())
-        assertEquals(HEXColor("#FFFFFF"), WHITE.toHEX())
+        assertEquals(HEXColor("#000000"), black.toHEX())
+        assertEquals(HEXColor("#0000FF"), blue.toHEX())
+        assertEquals(HEXColor("#00FFFF"), cyan.toHEX())
+        assertEquals(HEXColor("#404040"), darkGray.toHEX())
+        assertEquals(HEXColor("#FFC800"), orange.toHEX())
+        assertEquals(HEXColor("#FFAFAF"), pink.toHEX())
+        assertEquals(HEXColor("#FF0000"), red.toHEX())
+        assertEquals(HEXColor("#FFFFFF"), white.toHEX())
     }
 
     @Test fun testConversionIntegrity() {
-        assertEquals(BLACK, BLACK.toHSV().toHEX().toRGB())
-        assertEquals(BLUE, BLUE.toHSV().toHEX().toRGB())
-        assertEquals(CYAN, CYAN.toHSV().toHEX().toRGB())
-        assertEquals(DARK_GRAY, DARK_GRAY.toHSV().toHEX().toRGB())
-        assertEquals(ORANGE, ORANGE.toHSV().toHEX().toRGB())
-        assertEquals(PINK, PINK.toHSV().toHEX().toRGB())
-        assertEquals(RED, RED.toHSV().toHEX().toRGB())
-        assertEquals(WHITE, WHITE.toHSV().toHEX().toRGB())
+        assertEquals(black, black.toHSV().toHEX().toRGB())
+        assertEquals(blue, blue.toHSV().toHEX().toRGB())
+        assertEquals(cyan, cyan.toHSV().toHEX().toRGB())
+        assertEquals(darkGray, darkGray.toHSV().toHEX().toRGB())
+        assertEquals(orange, orange.toHSV().toHEX().toRGB())
+        assertEquals(pink, pink.toHSV().toHEX().toRGB())
+        assertEquals(red, red.toHSV().toHEX().toRGB())
+        assertEquals(white, white.toHSV().toHEX().toRGB())
     }
 }
