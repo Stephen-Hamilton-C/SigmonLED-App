@@ -48,6 +48,15 @@ android {
 
 dependencies {
 
+    // BLE - https://github.com/NordicSemiconductor/Android-BLE-Library
+    // latest stable version is 2.5.1. If this starts acting up, give 2.5.1 a try.
+    def ble_version = "2.6.0-alpha03"
+    implementation "no.nordicsemi.android:ble:$ble_version"
+    implementation "no.nordicsemi.android:ble-ktx:$ble_version"
+
+    // BLE Scanning - https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library
+    implementation "no.nordicsemi.android.support.v18:scanner:1.6.0"
+
     // Reaktive - https://github.com/badoo/Reaktive
     def reaktive_version = "1.2.2"
     implementation "com.badoo.reaktive:reaktive:$reaktive_version"
