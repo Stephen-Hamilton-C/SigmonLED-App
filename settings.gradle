@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "SigmonLED-App"
+rootProject.name = "SigmonLED"
 include ':app'
