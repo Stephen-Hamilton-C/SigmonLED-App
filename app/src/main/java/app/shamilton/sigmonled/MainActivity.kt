@@ -10,6 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.core.ContextService
 import app.shamilton.sigmonled.ui.theme.SigmonLEDAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,6 +21,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ContextService.context = this
         // Request Bluetooth permissions
         setContent {
             SigmonLEDAppTheme {

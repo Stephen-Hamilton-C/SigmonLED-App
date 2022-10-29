@@ -1,6 +1,6 @@
 package app.shamilton.sigmonled.core.bluetooth
 
-data class BluetoothDevice(
+data class Device(
     val displayName: String,
     val macAddress: String,
 )
