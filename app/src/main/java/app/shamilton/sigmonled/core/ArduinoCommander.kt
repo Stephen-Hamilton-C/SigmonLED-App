@@ -15,6 +15,7 @@ object ArduinoCommander {
         private set
 
     init {
+        println("ArduinoCommander START=================================================================================")
         // Kotlin is a little weird with scopes here... So this needs to be initialized to null first
         var d: Disposable? = null
         d = ContextService.onContextReceived.subscribe { context ->
@@ -90,7 +91,7 @@ object ArduinoCommander {
 
     fun wake() {
         checkDeviceManager()
-        deviceManager?.write("S")
+        deviceManager?.write("W")
     }
 
     private fun checkDeviceManager() {

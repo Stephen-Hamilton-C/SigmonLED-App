@@ -41,8 +41,8 @@ class DeviceManager(context: Context) : BleManager(context) {
         private set(value) {
             if(value != null) {
                 onDeviceConnected.onNext(value)
-            } else {
-                onDeviceConnected.onNext(field!!)
+            } else if (field != null) {
+                onDeviceDisconnected.onNext(field!!)
             }
             field = value
         }
@@ -55,9 +55,46 @@ class DeviceManager(context: Context) : BleManager(context) {
     private val serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")
     private val charUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb")
 
+    companion object {
+        var count = 0
+    }
+
     init {
-        onDeviceFound.subscribe { device ->
+        println("-----------------------------------------------------------------------------------------------------------------------NEW DEVICEMANAGER!!!")
+        count++
+        onScanningStarted.subscribe {
+            println("Scanning started")
+        }
+        onScanningStopped.subscribe {
+            println("Scanning stopped")
+        }
+        onDeviceFound.subscribe(false, null, null, null, onNext = { device ->
+            try {
+                println("Discovered device: ${device.name} - ${device.address}")
+            } catch(se: SecurityException) {
+                println("Discovered device: ${device.address}")
+            }
             discoveredDevices.add(device)
+        })
+        onDeviceConnected.subscribe {
+            try {
+                println("Connected to device: ${it.name} - ${it.address}")
+            } catch(se: SecurityException) {
+                println("Connected to device: ${it.address}")
+            }
+        }
+        onDeviceDisconnected.subscribe {
+            try {
+                println("Disconnected from device: ${it.name} - ${it.address}")
+            } catch(se: SecurityException) {
+                println("Disconnected from device: ${it.address}")
+            }
+        }
+        onDeviceReady.subscribe {
+            println("Device is ${if(!ready) "not " else ""}ready.")
+        }
+        onBluetoothError.subscribe {
+            println("Bluetooth error was thrown with error code $it")
         }
     }
 
@@ -89,15 +126,12 @@ class DeviceManager(context: Context) : BleManager(context) {
         scanning = false
     }
 
-    fun connect(device: Device): Boolean {
-        val desiredDevice = discoveredDevices.find { bluetoothDevice ->
-            bluetoothDevice.address == device.macAddress
-        } ?: return false
-
-        super.connect(desiredDevice)
+    fun tryConnect(device: BluetoothDevice) {
+        super.connect(device)
             .retry(3, 100)
             .useAutoConnect(true)
             .done { bluetoothDevice ->
+                println("Finished connecting")
                 connectedDevice = bluetoothDevice
             }
             .fail { bluetoothDevice, status ->
@@ -107,15 +141,35 @@ class DeviceManager(context: Context) : BleManager(context) {
                 onBluetoothError.onNext(err)
             }
             .enqueue()
+        println("Queued connection")
+    }
+
+    fun tryConnect(device: Device): Boolean {
+        println("Attempting to connect to ${device.displayName} - ${device.macAddress}")
+        // FIXME: discoveredDevices is empty??
+        val desiredDevice = discoveredDevices.find { bluetoothDevice ->
+            bluetoothDevice.address == device.macAddress
+        } ?: return false
+        println("Found BluetoothDevice")
+
+        tryConnect(desiredDevice)
         return true
     }
 
     fun write(command: String) {
-        super.writeCharacteristic(controlPoint, command.encodeToByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+        println("Writing...")
+        super.writeCharacteristic(controlPoint, command.toByteArray(Charsets.US_ASCII), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
             .fail { _, status ->
                 onBluetoothError.onNext(BluetoothWriteException(status))
             }
+            .done {
+                println("Finished writing")
+            }
+            .invalid {
+                println("invalid?")
+            }
             .enqueue()
+        println("Queued write")
     }
 
     override fun getGattCallback(): BleManagerGattCallback = MyGattCallbackImpl(this)
@@ -125,10 +179,15 @@ class DeviceManager(context: Context) : BleManager(context) {
         override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
             // Here get instances of your characteristics.
             // Return false if a required service has not been discovered.
+            println("Checking for required service...")
             val serialService = gatt.getService(deviceManager.serviceUUID)
             if (serialService != null) {
+                println("Found service")
+                // FIXME: Is this something with threads or multiple instances?
+                // controlPoint is not getting set
                 deviceManager.controlPoint = serialService.getCharacteristic(deviceManager.charUUID)
             }
+            println("Returning ${deviceManager.controlPoint != null}")
             return deviceManager.controlPoint != null
         }
 
@@ -137,7 +196,7 @@ class DeviceManager(context: Context) : BleManager(context) {
             // This means e.g. enabling notifications, setting notification callbacks,
             // sometimes writing something to some Control Point.
             // Kotlin projects should not use suspend methods here, which require a scope.
-            println("Device initialized")
+            println("Device initialized.")
             deviceManager.ready = true
         }
 
@@ -145,8 +204,10 @@ class DeviceManager(context: Context) : BleManager(context) {
             // This method is called when the services get invalidated, i.e. when the device
             // disconnects.
             // References to characteristics should be nullified here.
+            println("Services invalidated.")
             deviceManager.controlPoint = null
             deviceManager.connectedDevice = null
+            deviceManager.ready = false
         }
     }
 
@@ -156,13 +217,14 @@ class DeviceManager(context: Context) : BleManager(context) {
                 CALLBACK_TYPE_ALL_MATCHES -> println("Callback Type All Matches")
                 CALLBACK_TYPE_FIRST_MATCH -> println("Callback Type First Match")
                 CALLBACK_TYPE_MATCH_LOST -> println("Callback Type Match Lost")
+                else -> println("Unknown callback type: $callbackType")
             }
             deviceManager.onDeviceFound.onNext(result.device)
         }
 
         override fun onBatchScanResults(results: MutableList<ScanResult>) {
             println("Batch scan result:")
-            println(results.joinToString(", "))
+            println("[${results.joinToString(", ")}]")
             for(result in results) {
                 deviceManager.onDeviceFound.onNext(result.device)
             }
@@ -177,6 +239,7 @@ class DeviceManager(context: Context) : BleManager(context) {
                 SCAN_FAILED_INTERNAL_ERROR -> println("Internal error")
                 SCAN_FAILED_SCANNING_TOO_FREQUENTLY -> println("Too many scans")
                 SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES -> println("Out of resources (memory?)")
+                else -> println("Unknown error code: $errorCode")
             }
             deviceManager.onBluetoothError.onNext(BluetoothScanException(errorCode))
             if(errorCode != SCAN_FAILED_ALREADY_STARTED) {
