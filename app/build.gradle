@@ -1,6 +1,9 @@
 plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
+
+    // Kotlinx Serialization - https://github.com/Kotlin/kotlinx.serialization
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
 }
 
 android {
@@ -47,6 +50,9 @@ android {
 }
 
 dependencies {
+
+    // Kotlinx.serialization - https://github.com/Kotlin/kotlinx.serialization
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
 
     // BLE - https://github.com/NordicSemiconductor/Android-BLE-Library
     // latest stable version is 2.5.1. If this starts acting up, give 2.5.1 a try.
