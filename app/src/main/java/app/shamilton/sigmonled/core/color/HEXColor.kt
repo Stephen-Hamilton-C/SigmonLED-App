@@ -1,11 +1,13 @@
 package app.shamilton.sigmonled.core.color
 
 import app.shamilton.sigmonled.core.Util
+import kotlinx.serialization.Serializable
 
 /**
  * A representation of a color in red, green, and blue as hexadecimal characters.
  * @constructor Creates a Black HEXColor
  */
+@Serializable
 class HEXColor() {
 
     /**

@@ -1,6 +1,7 @@
 package app.shamilton.sigmonled.core.color
 
 import kotlin.math.round
+import kotlinx.serialization.Serializable
 
 /**
  * A representation of a color in hue, saturation, and brightness (value)
@@ -8,6 +9,7 @@ import kotlin.math.round
  * @param s Saturation, 0.0 - 1.0
  * @param v Brightness (Value), 0.0 - 1.0
  */
+@Serializable
 data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.0) {
 
     /**

@@ -1,11 +1,13 @@
 package app.shamilton.sigmonled.core.palette
 
 import app.shamilton.sigmonled.core.color.Color
+import kotlinx.serialization.Serializable
 
 /**
  * Stores a palette with its 16 colors, either all at once or in a repeating pattern
  * @constructor Creates a palette with the colors provided. The list size must be a multiple of 16.
  */
+@Serializable
 data class Palette(
     private val colors: List<Color>
 ) {

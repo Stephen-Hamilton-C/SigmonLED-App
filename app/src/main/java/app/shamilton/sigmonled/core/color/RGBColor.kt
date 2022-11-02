@@ -3,6 +3,7 @@ package app.shamilton.sigmonled.core.color
 import app.shamilton.sigmonled.core.toHex
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.serialization.Serializable
 
 /**
  * A representation of a color in red, green, and blue
@@ -10,6 +11,7 @@ import kotlin.math.min
  * @param g Green, 0 - 255
  * @param b Blue, 0 - 255
  */
+@Serializable
 data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
 
     /**

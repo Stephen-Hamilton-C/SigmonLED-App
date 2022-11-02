@@ -1,8 +1,13 @@
 package app.shamilton.sigmonled.core.color
 
+import kotlinx.serialization.Serializable
+
+
+// TODO: Write a custom serializer that only stores the RGBColor
 /**
  * A representation of a color using RGB, HSV, or HEX
  */
+@Serializable
 class Color() {
 
     /**
