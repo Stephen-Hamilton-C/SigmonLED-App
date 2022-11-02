@@ -17,21 +17,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import app.shamilton.sigmonled.core.ArduinoCommander
-import app.shamilton.sigmonled.core.ContextService
 import app.shamilton.sigmonled.core.bluetooth.Device
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
 import com.badoo.reaktive.observable.subscribe
+import com.badoo.reaktive.subject.publish.PublishSubject
 
 
 class MainActivity : ComponentActivity() {
-    override fun onResume() {
-        super.onResume()
+
+    companion object {
+        var instance: MainActivity? = null
+            private set
+        val onCreated = PublishSubject<Bundle?>()
+        val onStarted = PublishSubject<Nothing?>()
+        val onRestarted = PublishSubject<Nothing?>()
+        val onResumed = PublishSubject<Nothing?>()
+        val onPaused = PublishSubject<Nothing?>()
+        val onStopped = PublishSubject<Nothing?>()
+        val onDestroyed = PublishSubject<Nothing?>()
+    }
+
+    init {
+        if(instance != null) {
+            throw IllegalStateException("Multiple MainActivities exist!")
+        }
+        instance = this
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ContextService.context = this
+        onCreated.onNext(savedInstanceState)
 
         requestPermissions()
 
@@ -46,6 +62,36 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        onStarted.onNext(null)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        onRestarted.onNext(null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onResumed.onNext(null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        onPaused.onNext(null)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        onStopped.onNext(null)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        onDestroyed.onNext(null)
     }
 
     private fun requestPermissions() {
@@ -96,9 +142,7 @@ fun Greeting(name: String) {
     }
     Column() {
         val scanButton = Button(onClick = {
-            if (ContextService.context != null) {
-                deviceManager.scan()
-            }
+            deviceManager.scan()
         },
         enabled = !scanning
         ) {
