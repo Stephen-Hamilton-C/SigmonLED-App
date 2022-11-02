@@ -14,6 +14,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanSettings.*
 import java.util.*
 import kotlin.concurrent.schedule
 
+// TODO: Make a private class inside so BleManager methods are not exposed
 class DeviceManager(context: Context) : BleManager(context) {
     val onScanningStarted = PublishSubject<Nothing?>()
     val onScanningStopped = PublishSubject<Nothing?>()
@@ -98,14 +99,10 @@ class DeviceManager(context: Context) : BleManager(context) {
         }
     }
 
-    // Apparently this is done by BleManager, look into this.
-//    var isConnected: Boolean = false
-//        private set
-
     fun scan() {
         val settings: ScanSettings = ScanSettings.Builder()
             .setLegacy(false)
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setScanMode(SCAN_MODE_LOW_LATENCY)
             .setReportDelay(5000)
             .setUseHardwareBatchingIfSupported(true)
             .build()
@@ -146,7 +143,7 @@ class DeviceManager(context: Context) : BleManager(context) {
 
     fun tryConnect(device: Device): Boolean {
         println("Attempting to connect to ${device.displayName} - ${device.macAddress}")
-        // FIXME: discoveredDevices is empty??
+        // FIXME: discoveredDevices is empty?? Check this now. Could just be that 4 DeviceManagers existed
         val desiredDevice = discoveredDevices.find { bluetoothDevice ->
             bluetoothDevice.address == device.macAddress
         } ?: return false
@@ -157,19 +154,14 @@ class DeviceManager(context: Context) : BleManager(context) {
     }
 
     fun write(command: String) {
-        println("Writing...")
         super.writeCharacteristic(controlPoint, command.toByteArray(Charsets.US_ASCII), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
             .fail { _, status ->
                 onBluetoothError.onNext(BluetoothWriteException(status))
             }
-            .done {
-                println("Finished writing")
-            }
             .invalid {
-                println("invalid?")
+                println("Not connected to a device. Nothing could be written")
             }
             .enqueue()
-        println("Queued write")
     }
 
     override fun getGattCallback(): BleManagerGattCallback = MyGattCallbackImpl(this)
@@ -183,8 +175,6 @@ class DeviceManager(context: Context) : BleManager(context) {
             val serialService = gatt.getService(deviceManager.serviceUUID)
             if (serialService != null) {
                 println("Found service")
-                // FIXME: Is this something with threads or multiple instances?
-                // controlPoint is not getting set
                 deviceManager.controlPoint = serialService.getCharacteristic(deviceManager.charUUID)
             }
             println("Returning ${deviceManager.controlPoint != null}")
@@ -245,6 +235,12 @@ class DeviceManager(context: Context) : BleManager(context) {
             if(errorCode != SCAN_FAILED_ALREADY_STARTED) {
                 deviceManager.scanning = false
             }
+        }
+    }
+
+    private class InternalManager(context: Context) : BleManager(context) {
+        override fun getGattCallback(): BleManagerGattCallback {
+            TODO("Not yet implemented")
         }
     }
 }
