@@ -148,7 +148,7 @@ fun Greeting(name: String) {
         }
         Button(onClick = {
             if(discoveredDevice != null) {
-                deviceManager.tryConnect(discoveredDevice!!)
+                deviceManager.connect(discoveredDevice!!)
             } else {
                 println("DiscoveredDevice is null.")
             }

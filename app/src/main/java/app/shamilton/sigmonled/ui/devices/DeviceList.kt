@@ -18,7 +18,7 @@ private fun scanClicked() {
 
 @Composable
 fun DeviceList() {
-    var scanButtonEnabled by remember { mutableStateOf(true) }
+    var scanButtonEnabled by remember { mutableStateOf(!devMan.scanning) }
     devMan.onScanningStarted.subscribe { scanButtonEnabled = false }
     devMan.onScanningStopped.subscribe { scanButtonEnabled = true }
     devMan.onDeviceFound.subscribe { device ->
