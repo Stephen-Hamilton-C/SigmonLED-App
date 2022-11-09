@@ -1,10 +1,13 @@
 package app.shamilton.sigmonled.ui.devices
 
 import android.bluetooth.BluetoothDevice
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import app.shamilton.sigmonled.core.ArduinoCommander
 import com.badoo.reaktive.observable.subscribe
 
@@ -48,7 +51,7 @@ fun DeviceButton(device: BluetoothDevice) {
     }
 
     // Connect/Disconnect Button
-    Button(onClick = { deviceButtonClicked(device) }) {
+    Button(onClick = { deviceButtonClicked(device) }, Modifier.fillMaxWidth()) {
         Text(displayName, color = displayNameColor)
     }
 }

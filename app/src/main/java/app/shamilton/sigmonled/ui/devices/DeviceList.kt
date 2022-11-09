@@ -2,9 +2,11 @@ package app.shamilton.sigmonled.ui.devices
 
 import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import app.shamilton.sigmonled.core.ArduinoCommander
 import com.badoo.reaktive.observable.subscribe
@@ -27,7 +29,8 @@ fun DeviceList() {
 
     Column() {
         // Scan button
-        Button(onClick = ::scanClicked, enabled = scanButtonEnabled) {
+        Button(onClick = ::scanClicked, enabled = scanButtonEnabled,
+        modifier = Modifier.fillMaxWidth()) {
             Text("Scan")
         }
 
@@ -36,10 +39,4 @@ fun DeviceList() {
             DeviceButton(device)
         }
     }
-}
-
-@Preview
-@Composable
-fun Preview() {
-    DeviceList()
 }

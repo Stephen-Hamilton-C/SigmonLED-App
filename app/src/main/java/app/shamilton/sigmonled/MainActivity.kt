@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
 import app.shamilton.sigmonled.ui.topbar.TopBar
+import app.shamilton.sigmonled.ui.view.MainView
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 
@@ -56,11 +57,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.primary,
                 ) {
-                    Scaffold(
-                        topBar = { TopBar.TopBar() }
-                    ) {
-                        Greeting("Android")
-                    }
+                    MainView()
                 }
             }
         }
@@ -113,69 +110,61 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun Greeting(name: String) {
-    val deviceManager = ArduinoCommander.deviceManager!!
-    var scanning by remember { mutableStateOf(false) }
-    var canWrite by remember { mutableStateOf(false) }
-    var discoveredDevice: BluetoothDevice? by remember { mutableStateOf(null) }
-    deviceManager.onScanningStarted.subscribe {
-        scanning = true
-        println("DeviceManager.scanning: ${deviceManager.scanning}")
-    }
-    deviceManager.onScanningStopped.subscribe {
-        scanning = false
-        println("DeviceManager.scanning: ${deviceManager.scanning}")
-    }
-    deviceManager.onDeviceFound.subscribe {
-        println("Device found")
-        discoveredDevice = it
-        deviceManager.stopScan()
-    }
-    deviceManager.onDeviceConnected.subscribe {
-        canWrite = true
-    }
-    deviceManager.onDeviceDisconnected.subscribe {
-        canWrite = false
-    }
-    Column() {
-        val scanButton = Button(onClick = {
-            deviceManager.scan()
-        },
-        enabled = !scanning
-        ) {
-            Text("Scan")
-        }
-        Button(onClick = {
-            if(discoveredDevice != null) {
-                deviceManager.connect(discoveredDevice!!)
-            } else {
-                println("DiscoveredDevice is null.")
-            }
-        }) {
-            Text("Connect to first discovered device")
-        }
-        Button(onClick = {
-                         ArduinoCommander.wake()
-        },
-            enabled = canWrite
-        ) {
-            Text("Wake")
-        }
-        Button(onClick = {
-                         ArduinoCommander.sleep()
-        },
-            enabled = canWrite
-        ) {
-            Text("Sleep")
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    SigmonLEDTheme {
-        Greeting("Android")
-    }
-}
+//@Composable
+//fun Greeting(name: String) {
+//    val deviceManager = ArduinoCommander.deviceManager
+//    var scanning by remember { mutableStateOf(false) }
+//    var canWrite by remember { mutableStateOf(false) }
+//    var discoveredDevice: BluetoothDevice? by remember { mutableStateOf(null) }
+//    deviceManager.onScanningStarted.subscribe {
+//        scanning = true
+//        println("DeviceManager.scanning: ${deviceManager.scanning}")
+//    }
+//    deviceManager.onScanningStopped.subscribe {
+//        scanning = false
+//        println("DeviceManager.scanning: ${deviceManager.scanning}")
+//    }
+//    deviceManager.onDeviceFound.subscribe {
+//        println("Device found")
+//        discoveredDevice = it
+//        deviceManager.stopScan()
+//    }
+//    deviceManager.onDeviceConnected.subscribe {
+//        canWrite = true
+//    }
+//    deviceManager.onDeviceDisconnected.subscribe {
+//        canWrite = false
+//    }
+//    Column() {
+//        val scanButton = Button(onClick = {
+//            deviceManager.scan()
+//        },
+//        enabled = !scanning
+//        ) {
+//            Text("Scan")
+//        }
+//        Button(onClick = {
+//            if(discoveredDevice != null) {
+//                deviceManager.connect(discoveredDevice!!)
+//            } else {
+//                println("DiscoveredDevice is null.")
+//            }
+//        }) {
+//            Text("Connect to first discovered device")
+//        }
+//        Button(onClick = {
+//                         ArduinoCommander.wake()
+//        },
+//            enabled = canWrite
+//        ) {
+//            Text("Wake")
+//        }
+//        Button(onClick = {
+//                         ArduinoCommander.sleep()
+//        },
+//            enabled = canWrite
+//        ) {
+//            Text("Sleep")
+//        }
+//    }
+//}
