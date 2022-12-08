@@ -204,7 +204,7 @@ class DeviceManager(context: Context) {
      */
     fun connect(device: Device): Boolean {
         println("Attempting to connect to ${device.displayName} - ${device.macAddress}")
-        // FIXME: discoveredDevices is empty?? Check this now. Could just be that 4 DeviceManagers existed
+        // TODO: discoveredDevices is empty?? Check this now. Could just be that 4 DeviceManagers existed
         val desiredDevice = discoveredDevices.find { bluetoothDevice ->
             bluetoothDevice.address == device.macAddress
         } ?: return false
@@ -219,6 +219,7 @@ class DeviceManager(context: Context) {
      * If no device is connected, nothing will be written.
      */
     fun write(command: String) {
+        println(this)
         bleManager.write(command)
     }
 
@@ -268,9 +269,44 @@ class DeviceManager(context: Context) {
      * This class does most of the actual heavy lifting with Bluetooth.
      * It's hidden in here because it has a bunch of public methods that shouldn't be exposed.
      */
-    // FIXME: Will this even work? Somehow deviceManager is null! Is it because it isn't finished initializing?
     private class InternalManager(val deviceManager: DeviceManager, context: Context) : BleManager(context) {
-        override fun getGattCallback(): BleManagerGattCallback = MyGattCallbackImpl(deviceManager)
+
+        // This is a really cursed solution to a really cursed problem
+        // So because this class extends BleManager, BleManager must be constructed
+        // before this class is constructed. While BleManager is being constructed, it calls
+        // getGattCallback() at some point. This class then goes "Oh! I have an override! Use me!"
+        // However, because this class isn't constructed yet, deviceManager, a non-nullable property,
+        // is null. Which then gets passed to the MyGattCallbackImpl constructor, which has a
+        // non-nullable property for deviceManager. It then freaks out and throws.
+        // So, to solve this, I have here a list of callbacks that were retrieved before this class
+        // was constructed. When retrieving a callback, it first checks if deviceManager is null.
+        // If it is, it then adds the retrieved callback to the list before returning that callback.
+        // Finally, when the class is constructed, it checks if there were any callbacks retrieved.
+        // If there were, then it goes through each of them and sets the now-initialized
+        // deviceManager property.
+        private var preconstructedCallbacks: MutableList<MyGattCallbackImpl>? = null
+        init {
+            if(preconstructedCallbacks != null) {
+                for(callback in preconstructedCallbacks!!) {
+                    callback.deviceManager = deviceManager
+                }
+                preconstructedCallbacks = null
+            }
+        }
+
+        override fun getGattCallback(): BleManagerGattCallback {
+            val callback = MyGattCallbackImpl(deviceManager)
+
+            // This, in fact, can be null. Read the wall of comments above
+            @Suppress("ConstantConditionIf")
+            if(deviceManager == null) {
+                if(preconstructedCallbacks == null)
+                    preconstructedCallbacks = mutableListOf<MyGattCallbackImpl>()
+                preconstructedCallbacks!!.add(callback)
+            }
+
+            return callback
+        }
 
         /**
          * Writes to the command Characteristic
@@ -290,19 +326,23 @@ class DeviceManager(context: Context) {
                 .enqueue()
         }
 
-        private class MyGattCallbackImpl(val deviceManager: DeviceManager) : BleManagerGattCallback() {
+        private class MyGattCallbackImpl(var deviceManager: DeviceManager?) : BleManagerGattCallback() {
+
+            // I really don't wanna type !! all the time
+            val devMan: DeviceManager
+                get() = deviceManager!!
 
             override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
                 // Here get instances of your characteristics.
                 // Return false if a required service has not been discovered.
                 println("Checking for required service...")
-                val serialService = gatt.getService(deviceManager.serviceUUID)
+                val serialService = gatt.getService(devMan.serviceUUID)
                 if (serialService != null) {
                     println("Found service")
-                    deviceManager.controlPoint = serialService.getCharacteristic(deviceManager.charUUID)
+                    devMan.controlPoint = serialService.getCharacteristic(devMan.charUUID)
                 }
-                println("Returning ${deviceManager.controlPoint != null}")
-                return deviceManager.controlPoint != null
+                println("Returning ${devMan.controlPoint != null}")
+                return devMan.controlPoint != null
             }
 
             override fun initialize() {
@@ -311,9 +351,9 @@ class DeviceManager(context: Context) {
                 // sometimes writing something to some Control Point.
                 // Kotlin projects should not use suspend methods here, which require a scope.
                 println("Device initialized.")
-                deviceManager.ready = true
+                devMan.ready = true
                 // Send the "nevermind" command to reset state
-                deviceManager.write("x")
+                devMan.write("x")
             }
 
             override fun onServicesInvalidated() {
@@ -321,9 +361,9 @@ class DeviceManager(context: Context) {
                 // disconnects.
                 // References to characteristics should be nullified here.
                 println("Services invalidated.")
-                deviceManager.controlPoint = null
-                deviceManager.connectedDevice = null
-                deviceManager.ready = false
+                devMan.controlPoint = null
+                devMan.connectedDevice = null
+                devMan.ready = false
             }
         }
     }
