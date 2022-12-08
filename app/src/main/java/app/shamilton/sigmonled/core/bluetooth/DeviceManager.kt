@@ -141,7 +141,7 @@ class DeviceManager(context: Context) {
      * The scan automatically gets stopped after 15 seconds
      */
     fun scan() {
-        val settings: ScanSettings = ScanSettings.Builder()
+        val settings: ScanSettings = Builder()
             .setLegacy(false)
             .setScanMode(SCAN_MODE_LOW_LATENCY)
             .setReportDelay(5000)
@@ -301,7 +301,7 @@ class DeviceManager(context: Context) {
             @Suppress("ConstantConditionIf")
             if(deviceManager == null) {
                 if(preconstructedCallbacks == null)
-                    preconstructedCallbacks = mutableListOf<MyGattCallbackImpl>()
+                    preconstructedCallbacks = mutableListOf()
                 preconstructedCallbacks!!.add(callback)
             }
 
