@@ -2,23 +2,17 @@ package app.shamilton.sigmonled
 
 import android.Manifest.permission
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
-import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.ui.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
-import app.shamilton.sigmonled.ui.topbar.TopBar
-import app.shamilton.sigmonled.ui.view.MainView
-import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 
 
@@ -57,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.primary,
                 ) {
-                    MainView()
+                    AppScaffold.Component()
                 }
             }
         }
