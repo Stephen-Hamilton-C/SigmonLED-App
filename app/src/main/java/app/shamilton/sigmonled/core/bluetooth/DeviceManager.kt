@@ -268,6 +268,7 @@ class DeviceManager(context: Context) {
      * This class does most of the actual heavy lifting with Bluetooth.
      * It's hidden in here because it has a bunch of public methods that shouldn't be exposed.
      */
+    // FIXME: Will this even work? Somehow deviceManager is null! Is it because it isn't finished initializing?
     private class InternalManager(val deviceManager: DeviceManager, context: Context) : BleManager(context) {
         override fun getGattCallback(): BleManagerGattCallback = MyGattCallbackImpl(deviceManager)
 
