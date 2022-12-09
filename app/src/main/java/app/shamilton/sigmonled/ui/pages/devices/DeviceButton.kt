@@ -1,4 +1,4 @@
-package app.shamilton.sigmonled.ui.devices
+package app.shamilton.sigmonled.ui.pages.devices
 
 import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.fillMaxWidth

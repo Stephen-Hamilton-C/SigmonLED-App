@@ -1,4 +1,4 @@
-package app.shamilton.sigmonled.ui.devices
+package app.shamilton.sigmonled.ui.pages.devices
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

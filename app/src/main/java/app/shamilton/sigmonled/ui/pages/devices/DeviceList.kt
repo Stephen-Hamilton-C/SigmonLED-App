@@ -1,4 +1,4 @@
-package app.shamilton.sigmonled.ui.devices
+package app.shamilton.sigmonled.ui.pages.devices
 
 import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import app.shamilton.sigmonled.core.ArduinoCommander
 import com.badoo.reaktive.observable.subscribe
 

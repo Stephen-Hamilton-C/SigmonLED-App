@@ -4,20 +4,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.BluetoothConnected
-import androidx.compose.material.icons.outlined.BluetoothDisabled
-import androidx.compose.material.icons.rounded.BluetoothConnected
-import androidx.compose.material.icons.rounded.BluetoothDisabled
-import androidx.compose.material.icons.sharp.BluetoothConnected
-import androidx.compose.material.icons.sharp.BluetoothDisabled
-import androidx.compose.material.icons.twotone.BluetoothConnected
-import androidx.compose.material.icons.twotone.BluetoothDisabled
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.ui.pages.Pages
+import app.shamilton.sigmonled.ui.pages.devices.DeviceList
 import com.badoo.reaktive.observable.subscribe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +32,7 @@ object AppScaffold : IComponent {
     override fun Component() {
         scaffoldState = rememberScaffoldState()
         scope = rememberCoroutineScope()
+        val navController = rememberNavController()
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -44,17 +43,16 @@ object AppScaffold : IComponent {
             },
             floatingActionButtonPosition = FabPosition.End,
         ) {
-            Content(Modifier.padding(it))
+            Content(Modifier.padding(it), navController)
         }
     }
 
     @Composable
     private fun FloatingActionButtons() {
-//        val deviceManager = ArduinoCommander.deviceManager
-//        var connected by remember { mutableStateOf(deviceManager.connectedDevice != null) }
-//        ArduinoCommander.deviceManager.onDeviceConnected.subscribe { connected = true }
-//        ArduinoCommander.deviceManager.onDeviceDisconnected.subscribe { connected = false }
-        var connected = true
+        val deviceManager = ArduinoCommander.deviceManager
+        var connected by remember { mutableStateOf(deviceManager.connectedDevice != null) }
+        ArduinoCommander.deviceManager.onDeviceConnected.subscribe { connected = true }
+        ArduinoCommander.deviceManager.onDeviceDisconnected.subscribe { connected = false }
 
         if(connected) {
             Column() {
@@ -110,15 +108,10 @@ object AppScaffold : IComponent {
     }
 
     @Composable
-    private fun Content(modifier: Modifier) {
-        val THREE_ELEMENT_LIST = listOf("First", "Second", "Third")
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = modifier.fillMaxSize(),
-        ) {
-            THREE_ELEMENT_LIST.forEach { text ->
-                Text(text = text, fontSize = 30.sp)
+    private fun Content(modifier: Modifier, navController: NavHostController) {
+        NavHost(navController = navController, startDestination = Pages.DEVICES.routeName) {
+            composable(Pages.DEVICES.routeName) {
+                DeviceList()
             }
         }
     }
