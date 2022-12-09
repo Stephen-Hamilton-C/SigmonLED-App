@@ -45,9 +45,13 @@ class DeviceManager(context: Context) {
      */
     val onDeviceReady = BehaviorSubject<Boolean>(false)
     /**
-     * Called when an error occurs during any Bluetooth process
+     * Called when attempting to connect to a device
      */
-    val onBluetoothError = PublishSubject<BluetoothException>()
+    val onAttemptingConnection = PublishSubject<Nothing?>()
+    /**
+     * Called when attempting to disconnect from a device
+     */
+    val onAttemptingDisconnect = PublishSubject<Nothing?>()
 
     // Status indicators
     /**
@@ -82,6 +86,19 @@ class DeviceManager(context: Context) {
             }
             field = value
         }
+    val isConnected: Boolean
+        get() = connectedDevice != null
+    val isDisconnected: Boolean
+        get() = connectedDevice == null
+
+    /**
+     * The device previously connected to
+     */
+    var previousDevice: BluetoothDevice? = null
+        private set
+
+    val discoveredDevices: Set<BluetoothDevice>
+        get() = _discoveredDevices
 
     // Private vars
     /**
@@ -91,7 +108,7 @@ class DeviceManager(context: Context) {
     private var controlPoint: BluetoothGattCharacteristic? = null
     private val scanner = BluetoothLeScannerCompat.getScanner()
     private val scannerCallback = MyScanCallbackImpl(this)
-    private val discoveredDevices = mutableListOf<BluetoothDevice>()
+    private val _discoveredDevices = mutableSetOf<BluetoothDevice>()
     private val bleManager = InternalManager(this, context)
 
     // UUIDs
@@ -112,7 +129,7 @@ class DeviceManager(context: Context) {
             } catch(se: SecurityException) {
                 println("Discovered device: ${device.address}")
             }
-            discoveredDevices.add(device)
+            _discoveredDevices.add(device)
         })
         onDeviceConnected.subscribe {
             try {
@@ -131,9 +148,6 @@ class DeviceManager(context: Context) {
         onDeviceReady.subscribe {
             println("Device is ${if(!ready) "not " else ""}ready.")
         }
-        onBluetoothError.subscribe {
-            println("Bluetooth error was thrown with error code $it")
-        }
     }
 
     /**
@@ -141,6 +155,10 @@ class DeviceManager(context: Context) {
      * The scan automatically gets stopped after 15 seconds
      */
     fun scan() {
+        _discoveredDevices.clear()
+        if(isConnected)
+            _discoveredDevices.add(connectedDevice!!)
+
         val settings: ScanSettings = Builder()
             .setLegacy(false)
             .setScanMode(SCAN_MODE_LOW_LATENCY)
@@ -170,29 +188,54 @@ class DeviceManager(context: Context) {
     /**
      * Attempts to connect to the given BluetoothDevice.
      * If successful, onDeviceConnected will be called.
-     * Otherwise, the onError will be called and an exception will be sent through onBluetoothError
+     * Otherwise, the onError will be called and an exception will be sent through onDeviceConnected
      * @param device The BluetoothDevice to connect to
+     * @param andThen Function to run after the device has been connected
      */
-    fun connect(device: BluetoothDevice) {
+    // TODO: There certainly has to be something in Reaktive or Java util for the equivalent of an rxjs Promise
+    fun connect(device: BluetoothDevice, andThen: (() -> Unit)? = null) {
         bleManager.connect(device)
             .retry(3, 100)
             .useAutoConnect(true)
             .done { bluetoothDevice ->
                 println("Finished connecting")
                 connectedDevice = bluetoothDevice
+
+                if (andThen != null)
+                    andThen()
             }
             .fail { bluetoothDevice, status ->
                 println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
-                val err = BluetoothConnectionException(bluetoothDevice, status)
-                onDeviceConnected.onError(err)
-                onBluetoothError.onNext(err)
+                onDeviceConnected.onError(BluetoothConnectionException(bluetoothDevice, status))
+            }.before {
+                onAttemptingConnection.onNext(null)
             }
             .enqueue()
         println("Queued connection")
     }
 
-    fun disconnect() {
-        connectedDevice = null
+    /**
+     * Disconnects from the currently connected device.
+     * Will send a BluetoothDisconnectException to onDeviceDisconnected
+     * if no device is connected
+     * @param andThen Function to run after the device has been disconnected
+     */
+    fun disconnect(andThen: (() -> Unit)? = null) {
+        previousDevice = connectedDevice
+        bleManager.disconnect().done {
+            println("Finished disconnecting")
+            connectedDevice = null
+
+            if(andThen != null)
+                andThen()
+
+        }.fail { bluetoothDevice, status ->
+            println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
+            onDeviceDisconnected.onError(BluetoothDisconnectException(bluetoothDevice, status))
+        }.before {
+            onAttemptingDisconnect.onNext(null)
+        }.enqueue()
+        println("Queued disconnect")
     }
 
     /**
@@ -200,17 +243,17 @@ class DeviceManager(context: Context) {
      * BluetoothDevices from a previous scan.
      * If this is called before any scan happens, it will always fail.
      * @param device The desired Device to connect to
+     * @param andThen Function to run after the desired Device has been connected
      * @return true if a BluetoothDevice could be found and a connection was queued, or false otherwise
      */
-    fun connect(device: Device): Boolean {
+    fun connect(device: Device, andThen: (() -> Unit)? = null): Boolean {
         println("Attempting to connect to ${device.displayName} - ${device.macAddress}")
-        // TODO: discoveredDevices is empty?? Check this now. Could just be that 4 DeviceManagers existed
-        val desiredDevice = discoveredDevices.find { bluetoothDevice ->
+        val desiredDevice = _discoveredDevices.find { bluetoothDevice ->
             bluetoothDevice.address == device.macAddress
         } ?: return false
         println("Found BluetoothDevice")
 
-        connect(desiredDevice)
+        connect(desiredDevice, andThen)
         return true
     }
 
@@ -219,7 +262,6 @@ class DeviceManager(context: Context) {
      * If no device is connected, nothing will be written.
      */
     fun write(command: String) {
-        println(this)
         bleManager.write(command)
     }
 
@@ -258,7 +300,6 @@ class DeviceManager(context: Context) {
                 else -> println("Unknown error code: $errorCode")
             }
             deviceManager.onDeviceFound.onError(BluetoothScanException(errorCode))
-            deviceManager.onBluetoothError.onNext(BluetoothScanException(errorCode))
             if(errorCode != SCAN_FAILED_ALREADY_STARTED) {
                 deviceManager.scanning = false
             }
@@ -318,7 +359,8 @@ class DeviceManager(context: Context) {
                 BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
             )
                 .fail { _, status ->
-                    deviceManager.onBluetoothError.onNext(BluetoothWriteException(status))
+                    // TODO: Need to somehow report this error
+//                    deviceManager.onBluetoothError.onNext(BluetoothWriteException(status))
                 }
                 .invalid {
                     println("Not connected to a device. Nothing could be written")

@@ -13,7 +13,6 @@ import app.shamilton.sigmonled.core.ArduinoCommander
 import com.badoo.reaktive.observable.subscribe
 
 private val devMan = ArduinoCommander.deviceManager
-private val discoveredDevices = mutableListOf<BluetoothDevice>()
 
 private fun scanClicked() {
     devMan.scan()
@@ -22,10 +21,14 @@ private fun scanClicked() {
 @Composable
 fun DeviceList() {
     var scanButtonEnabled by remember { mutableStateOf(!devMan.scanning) }
-    devMan.onScanningStarted.subscribe { scanButtonEnabled = false }
+    devMan.onScanningStarted.subscribe {
+        scanButtonEnabled = false
+        // Refresh view
+    }
     devMan.onScanningStopped.subscribe { scanButtonEnabled = true }
     devMan.onDeviceFound.subscribe { device ->
-        discoveredDevices.add(device)
+        // Refresh view
+        devMan.stopScan() // DEBUGGING PURPOSES ONLY! THE UI NEEDS TO BE FIXED HERE
     }
 
     Column() {
@@ -36,7 +39,7 @@ fun DeviceList() {
         }
 
         // List
-        for(device in discoveredDevices) {
+        for(device in devMan.discoveredDevices) {
             DeviceButton(device)
         }
     }

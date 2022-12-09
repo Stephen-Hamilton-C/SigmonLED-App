@@ -17,7 +17,7 @@ private fun deviceButtonClicked(device: BluetoothDevice) {
     if(devMan.connectedDevice === device) {
         devMan.disconnect()
     } else {
-        if(devMan.connectedDevice != null) {
+        if(devMan.isConnected) {
             devMan.disconnect()
         }
         devMan.connect(device)
