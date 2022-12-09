@@ -11,7 +11,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import app.shamilton.sigmonled.ui.AppScaffold
+import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.core.devMan
+import app.shamilton.sigmonled.ui.scaffold.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
 import com.badoo.reaktive.subject.publish.PublishSubject
 
@@ -64,6 +66,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onRestart() {
         super.onRestart()
+
+        if(devMan.previousDevice != null) {
+            devMan.connect(devMan.previousDevice!!)
+        }
+
         onRestarted.onNext(null)
     }
 
@@ -79,6 +86,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
+
+        devMan.disconnect()
+
         onStopped.onNext(null)
     }
 
