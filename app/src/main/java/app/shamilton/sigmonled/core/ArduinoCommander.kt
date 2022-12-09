@@ -10,6 +10,8 @@ import app.shamilton.sigmonled.core.palette.Palette
 import app.shamilton.sigmonled.core.palette.PaletteConfig
 import com.badoo.reaktive.disposable.Disposable
 
+val devMan = ArduinoCommander.deviceManager
+
 object ArduinoCommander {
 
     val deviceManager = DeviceManager(MainActivity.instance as Context)
