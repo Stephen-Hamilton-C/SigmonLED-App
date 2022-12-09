@@ -23,11 +23,11 @@ fun DeviceList() {
     var scanButtonEnabled by remember { mutableStateOf(!devMan.scanning) }
     devMan.onScanningStarted.subscribe {
         scanButtonEnabled = false
-        // Refresh view
+        // TODO: Refresh view
     }
     devMan.onScanningStopped.subscribe { scanButtonEnabled = true }
     devMan.onDeviceFound.subscribe { device ->
-        // Refresh view
+        // TODO: Refresh view
         devMan.stopScan() // DEBUGGING PURPOSES ONLY! THE UI NEEDS TO BE FIXED HERE
     }
 

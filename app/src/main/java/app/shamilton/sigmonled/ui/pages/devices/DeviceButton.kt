@@ -7,7 +7,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import app.shamilton.sigmonled.core.ArduinoCommander
 import com.badoo.reaktive.observable.subscribe
 
@@ -24,30 +23,34 @@ private fun deviceButtonClicked(device: BluetoothDevice) {
     }
 }
 
-private fun getDeviceButtonTextColor(device: BluetoothDevice): Color {
-    return if(devMan.connectedDevice === device) {
+private fun getColor(device: BluetoothDevice): Color {
+    return if(devMan.connectedDevice === device)
         Color.Blue
-    } else {
+    else
         Color.White
-    }
 }
 
 @Composable
 fun DeviceButton(device: BluetoothDevice) {
     // Text color
-    var displayNameColor by remember { mutableStateOf(Color.White) }
+    var displayNameColor by remember { mutableStateOf(getColor(device)) }
     devMan.onDeviceConnected.subscribe {
-        displayNameColor = getDeviceButtonTextColor(device)
+        if(it == device) {
+            displayNameColor = getColor(device)
+            // y u no refresh ;-;
+        }
     }
     devMan.onDeviceDisconnected.subscribe {
-        displayNameColor = getDeviceButtonTextColor(device)
+        displayNameColor = Color.White
+        // y u no refresh ;-;
     }
 
     // Text
+    // In rare edge cases, the properties of device will be null. Don't ask me how
     val displayName = try {
-        device.name
+        device.name ?: throw SecurityException()
     } catch(se: SecurityException) {
-        device.address
+        device.address ?: "BROKEN ADDRESS"
     }
 
     // Connect/Disconnect Button
