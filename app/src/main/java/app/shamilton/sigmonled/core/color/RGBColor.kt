@@ -1,6 +1,7 @@
 package app.shamilton.sigmonled.core.color
 
 import app.shamilton.sigmonled.core.toHex
+import app.shamilton.sigmonled.core.toHexPadded
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.serialization.Serializable
@@ -77,6 +78,6 @@ data class RGBColor(var r: Int = 0, var g: Int = 0, var b: Int = 0) {
      * @return A HEXColor
      */
     fun toHEX(): HEXColor {
-        return HEXColor(r.toHex(), g.toHex(), b.toHex())
+        return HEXColor(r.toHexPadded(2), g.toHexPadded(2), b.toHexPadded(2))
     }
 }
