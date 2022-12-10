@@ -4,31 +4,26 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import app.shamilton.sigmonled.core.devMan
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.observable.take
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun AppTopBar() {
+fun AppTopBar(viewModel: DeviceManagerViewModel = viewModel()) {
     val connectedIcon = Icons.Rounded.BluetoothConnected
     val disconnectedIcon = Icons.Rounded.Bluetooth
     var connectIcon by remember { mutableStateOf(disconnectedIcon) }
-    var connectIconEnabled by remember { mutableStateOf(true) }
-    var scanButtonEnabled by remember { mutableStateOf(true) }
+    var scanningToConnect by remember { mutableStateOf(false) }
 
     devMan.onDeviceConnected.subscribe {
         connectIcon = connectedIcon
-        connectIconEnabled = true
     }
     devMan.onDeviceDisconnected.subscribe {
         connectIcon = disconnectedIcon
-        connectIconEnabled = true
     }
-    devMan.onAttemptingConnection.subscribe { connectIconEnabled = false }
-    devMan.onAttemptingDisconnect.subscribe { connectIconEnabled = false }
-    devMan.onScanningStarted.subscribe { scanButtonEnabled = false }
-    devMan.onScanningStopped.subscribe { scanButtonEnabled = true }
 
     fun bluetoothButtonClicked() {
         if (devMan.isConnected) {
@@ -44,14 +39,14 @@ fun AppTopBar() {
             // Prepare events
             devMan.onScanningStopped.take(1).subscribe {
                 connectIcon = if(devMan.isConnected) connectedIcon else disconnectedIcon
-                connectIconEnabled = !devMan.isConnecting
+                scanningToConnect = false
             }
             devMan.onDeviceFound.take(1).subscribe {
                 devMan.stopScan()
                 devMan.connect(it)
             }
             fun scanningStarted() {
-                connectIconEnabled = false
+                scanningToConnect = true
                 connectIcon = Icons.Rounded.BluetoothSearching
             }
 
@@ -90,12 +85,15 @@ fun AppTopBar() {
         title = { Text("SigmonLED") },
         actions = {
             // Connect button
+            val connectEnabled = !viewModel.isConnecting && !viewModel.isDisconnecting && !scanningToConnect
+            println("isConnecting: ${viewModel.isConnecting}, isDisconnecting: ${viewModel.isDisconnecting}, scanningToConnect: $scanningToConnect")
+            println("connectEnabled: $connectEnabled")
             IconButton(
                 onClick = { bluetoothButtonClicked() },
-                enabled = connectIconEnabled,
+                enabled = connectEnabled,
             ) {
                 Icon(connectIcon, "Connection Status")
-                if(!connectIconEnabled) {
+                if(!connectEnabled) {
                     CircularProgressIndicator()
                 }
             }
@@ -104,10 +102,10 @@ fun AppTopBar() {
             // TODO: Only show on devices page
             IconButton(
                 onClick = { devMan.scan() },
-                enabled = scanButtonEnabled,
+                enabled = !viewModel.scanning,
             ) {
                 Icon(Icons.Rounded.Search, "Scan")
-                if(!scanButtonEnabled)
+                if(viewModel.scanning)
                     CircularProgressIndicator()
             }
         }
