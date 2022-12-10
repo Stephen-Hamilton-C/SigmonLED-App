@@ -204,7 +204,7 @@ class DeviceManager(context: Context) {
     // TODO: There certainly has to be something in Reaktive or Java util for the equivalent of an rxjs Promise
     fun connect(device: BluetoothDevice, andThen: ((success: Boolean) -> Unit)? = null) {
         bleManager.connect(device)
-            .retry(3, 100)
+            .retry(3, 1000)
             .useAutoConnect(true)
             .done { bluetoothDevice ->
                 println("Finished connecting")
@@ -214,6 +214,8 @@ class DeviceManager(context: Context) {
             }
             .fail { bluetoothDevice, status ->
                 println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
+                // TODO: Need to figure out why this crashes instead of alerts
+                // Also need to figure out how to repro. Seems to happen infrequently
                 onDeviceConnected.onError(BluetoothConnectionException(bluetoothDevice, status))
                 andThen?.invoke(false)
             }.before {
