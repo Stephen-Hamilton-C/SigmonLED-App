@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import app.shamilton.sigmonled.ui.IComponent
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.ui.pages.devices.DeviceList
+import app.shamilton.sigmonled.ui.pages.staticcolor.StaticColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -30,7 +31,7 @@ object AppScaffold : IComponent {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { AppTopBar() },
-            drawerContent = { Menu() },
+            drawerContent = { Menu(navController) },
             floatingActionButton = {
                 FloatingActionButtons()
             },
@@ -46,6 +47,9 @@ object AppScaffold : IComponent {
         NavHost(navController = navController, startDestination = Pages.DEVICES.routeName) {
             composable(Pages.DEVICES.routeName) {
                 DeviceList()
+            }
+            composable(Pages.STATIC_COLOR.routeName) {
+                StaticColor(modifier)
             }
         }
     }

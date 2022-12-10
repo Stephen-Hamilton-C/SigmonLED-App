@@ -8,22 +8,35 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
+import app.shamilton.sigmonled.ui.pages.Pages
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun Menu() {
-    val THREE_ELEMENT_LIST = listOf("First", "Second", "Third")
+fun Menu(navController: NavHostController, viewModel: DeviceManagerViewModel = viewModel()) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        THREE_ELEMENT_LIST.forEach { text ->
+        for(page in Pages.values()) {
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(page.routeName)
+                    val drawerState = AppScaffold.scaffoldState.drawerState
+                    AppScaffold.scope.launch {
+                        if (drawerState.isClosed)
+                            drawerState.open()
+                        else
+                            drawerState.close()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !page.disableOnDisconnect || (page.disableOnDisconnect && viewModel.isConnected)
             ) {
-                Text(text = text, fontSize = 30.sp)
+                Text(text = page.displayName)
             }
         }
     }
