@@ -7,21 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.core.devMan
 import com.badoo.reaktive.observable.subscribe
-
-private val devMan = ArduinoCommander.deviceManager
-
-private fun deviceButtonClicked(device: BluetoothDevice) {
-    if(devMan.connectedDevice === device) {
-        devMan.disconnect()
-    } else {
-        if(devMan.isConnected) {
-            devMan.disconnect()
-        }
-        devMan.connect(device)
-    }
-}
 
 private fun getColor(device: BluetoothDevice): Color {
     return if(devMan.connectedDevice === device)
@@ -34,6 +21,7 @@ private fun getColor(device: BluetoothDevice): Color {
 fun DeviceButton(device: BluetoothDevice) {
     // Text color
     var displayNameColor by remember { mutableStateOf(getColor(device)) }
+    var connectButtonEnabled by remember { mutableStateOf(true) }
     devMan.onDeviceConnected.subscribe {
         if(it == device) {
             displayNameColor = getColor(device)
@@ -54,7 +42,26 @@ fun DeviceButton(device: BluetoothDevice) {
     }
 
     // Connect/Disconnect Button
-    Button(onClick = { deviceButtonClicked(device) }, Modifier.fillMaxWidth()) {
+    fun deviceButtonClicked(device: BluetoothDevice) {
+        connectButtonEnabled = false
+
+        if(devMan.connectedDevice === device) {
+            devMan.disconnect() {
+                connectButtonEnabled = true
+            }
+        } else {
+            if(devMan.isConnected) {
+                devMan.disconnect()
+            }
+            devMan.connect(device)
+        }
+    }
+
+    Button(
+        onClick = { deviceButtonClicked(device) },
+        enabled = connectButtonEnabled,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Text(displayName, color = displayNameColor)
     }
 }
