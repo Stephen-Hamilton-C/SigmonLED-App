@@ -17,20 +17,23 @@ private val devMan = ArduinoCommander.deviceManager
 @Composable
 fun DeviceList() {
     var scanButtonEnabled by remember { mutableStateOf(!devMan.scanning) }
+    // TODO: there has got to be a better way to remember this
+    val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
+
     devMan.onScanningStarted.subscribe {
         scanButtonEnabled = false
-        // TODO: Refresh view
+        discoveredDevices.clear()
+        if(devMan.connectedDevice != null)
+            discoveredDevices.add(devMan.connectedDevice!!)
     }
     devMan.onScanningStopped.subscribe { scanButtonEnabled = true }
     devMan.onDeviceFound.subscribe { device ->
-        // TODO: Refresh view
-        devMan.stopScan() // DEBUGGING PURPOSES ONLY! THE UI NEEDS TO BE FIXED HERE
+        discoveredDevices.add(device)
     }
 
-    val discoveredDevices = devMan.discoveredDevices.toMutableStateList()
     Column() {
         // List
-        for(device in discoveredDevices) {
+        for(device in discoveredDevices.toSet()) {
             DeviceButton(device)
         }
     }
