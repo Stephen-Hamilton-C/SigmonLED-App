@@ -14,10 +14,6 @@ import com.badoo.reaktive.observable.subscribe
 
 private val devMan = ArduinoCommander.deviceManager
 
-private fun scanClicked() {
-    devMan.scan()
-}
-
 @Composable
 fun DeviceList() {
     var scanButtonEnabled by remember { mutableStateOf(!devMan.scanning) }
@@ -31,15 +27,10 @@ fun DeviceList() {
         devMan.stopScan() // DEBUGGING PURPOSES ONLY! THE UI NEEDS TO BE FIXED HERE
     }
 
+    val discoveredDevices = devMan.discoveredDevices.toMutableStateList()
     Column() {
-        // Scan button
-        Button(onClick = ::scanClicked, enabled = scanButtonEnabled,
-        modifier = Modifier.fillMaxWidth()) {
-            Text("Scan")
-        }
-
         // List
-        for(device in devMan.discoveredDevices) {
+        for(device in discoveredDevices) {
             DeviceButton(device)
         }
     }
