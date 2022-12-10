@@ -79,12 +79,13 @@ class DeviceManager(context: Context) {
      */
     var connectedDevice: BluetoothDevice? = null
         private set(value) {
+            val oldValue = field
+            field = value
             if(value != null) {
                 onDeviceConnected.onNext(value)
-            } else if (field != null) {
-                onDeviceDisconnected.onNext(field!!)
+            } else if (oldValue != null) {
+                onDeviceDisconnected.onNext(oldValue)
             }
-            field = value
         }
     val isConnected: Boolean
         get() = connectedDevice != null
