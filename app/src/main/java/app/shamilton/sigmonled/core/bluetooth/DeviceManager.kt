@@ -90,6 +90,18 @@ class DeviceManager(context: Context) {
         get() = connectedDevice != null
     val isDisconnected: Boolean
         get() = connectedDevice == null
+    var isConnecting: Boolean = false
+        private set(value) {
+            field = value
+            if(value)
+                onAttemptingConnection.onNext(null)
+        }
+    var isDisconnecting: Boolean = false
+        private set(value) {
+            field = value
+            if(value)
+                onAttemptingDisconnect.onNext(null)
+        }
 
     /**
      * The device previously connected to
@@ -107,9 +119,10 @@ class DeviceManager(context: Context) {
      */
     private var controlPoint: BluetoothGattCharacteristic? = null
     private val scanner = BluetoothLeScannerCompat.getScanner()
-    private val scannerCallback = MyScanCallbackImpl(this)
+    private val scannerCallback = DeviceManagerScanCallback(this)
     private val _discoveredDevices = mutableSetOf<BluetoothDevice>()
     private val bleManager = InternalManager(this, context)
+    private var scanningTask: TimerTask? = null
 
     // UUIDs
     private val serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")
@@ -170,10 +183,11 @@ class DeviceManager(context: Context) {
         )
         scanner.startScan(filters, settings, scannerCallback)
         scanning = true
-        Timer().schedule(15000) {
+        scanningTask = Timer().schedule(15000) {
             if(scanning) {
                 stopScan()
             }
+            scanningTask = null
         }
     }
 
@@ -183,17 +197,19 @@ class DeviceManager(context: Context) {
     fun stopScan() {
         scanner.stopScan(scannerCallback)
         scanning = false
+        scanningTask?.cancel()
     }
 
     /**
      * Attempts to connect to the given BluetoothDevice.
      * If successful, onDeviceConnected will be called.
      * Otherwise, the onError will be called and an exception will be sent through onDeviceConnected
-     * @param device The BluetoothDevice to connect to
+     * @param device The BluetoothDevice to connect to.
+     * Parameter is true if connection completed successfully.
      * @param andThen Function to run after the device has been connected
      */
     // TODO: There certainly has to be something in Reaktive or Java util for the equivalent of an rxjs Promise
-    fun connect(device: BluetoothDevice, andThen: (() -> Unit)? = null) {
+    fun connect(device: BluetoothDevice, andThen: ((success: Boolean) -> Unit)? = null) {
         bleManager.connect(device)
             .retry(3, 100)
             .useAutoConnect(true)
@@ -201,41 +217,18 @@ class DeviceManager(context: Context) {
                 println("Finished connecting")
                 connectedDevice = bluetoothDevice
 
-                if (andThen != null)
-                    andThen()
+                andThen?.invoke(true)
             }
             .fail { bluetoothDevice, status ->
                 println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
                 onDeviceConnected.onError(BluetoothConnectionException(bluetoothDevice, status))
+                andThen?.invoke(false)
             }.before {
-                onAttemptingConnection.onNext(null)
-            }
-            .enqueue()
+                isConnecting = true
+            }.then {
+                isConnecting = false
+            }.enqueue()
         println("Queued connection")
-    }
-
-    /**
-     * Disconnects from the currently connected device.
-     * Will send a BluetoothDisconnectException to onDeviceDisconnected
-     * if no device is connected
-     * @param andThen Function to run after the device has been disconnected
-     */
-    fun disconnect(andThen: (() -> Unit)? = null) {
-        previousDevice = connectedDevice
-        bleManager.disconnect().done {
-            println("Finished disconnecting")
-            connectedDevice = null
-
-            if(andThen != null)
-                andThen()
-
-        }.fail { bluetoothDevice, status ->
-            println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
-            onDeviceDisconnected.onError(BluetoothDisconnectException(bluetoothDevice, status))
-        }.before {
-            onAttemptingDisconnect.onNext(null)
-        }.enqueue()
-        println("Queued disconnect")
     }
 
     /**
@@ -243,10 +236,11 @@ class DeviceManager(context: Context) {
      * BluetoothDevices from a previous scan.
      * If this is called before any scan happens, it will always fail.
      * @param device The desired Device to connect to
-     * @param andThen Function to run after the desired Device has been connected
+     * @param andThen Function to run after the desired Device has been connected.
+     * Parameter is true if connection completed successfully.
      * @return true if a BluetoothDevice could be found and a connection was queued, or false otherwise
      */
-    fun connect(device: Device, andThen: (() -> Unit)? = null): Boolean {
+    fun connect(device: Device, andThen: ((success: Boolean) -> Unit)? = null): Boolean {
         println("Attempting to connect to ${device.displayName} - ${device.macAddress}")
         val desiredDevice = _discoveredDevices.find { bluetoothDevice ->
             bluetoothDevice.address == device.macAddress
@@ -258,6 +252,32 @@ class DeviceManager(context: Context) {
     }
 
     /**
+     * Disconnects from the currently connected device.
+     * Will send a BluetoothDisconnectException to onDeviceDisconnected
+     * if no device is connected
+     * @param andThen Function to run after the device has been disconnected.
+     * Parameter is true if disconnect completed successfully.
+     */
+    fun disconnect(andThen: ((success: Boolean) -> Unit)? = null) {
+        previousDevice = connectedDevice
+        bleManager.disconnect().done {
+            println("Finished disconnecting")
+            connectedDevice = null
+
+            andThen?.invoke(true)
+        }.fail { bluetoothDevice, status ->
+            println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
+            onDeviceDisconnected.onError(BluetoothDisconnectException(bluetoothDevice, status))
+            andThen?.invoke(false)
+        }.before {
+            isDisconnecting = true
+        }.then {
+            isDisconnecting = false
+        }.enqueue()
+        println("Queued disconnect")
+    }
+
+    /**
      * Sends a command to the currently connected device.
      * If no device is connected, nothing will be written.
      */
@@ -265,11 +285,10 @@ class DeviceManager(context: Context) {
         bleManager.write(command)
     }
 
-
     /**
      * Callback methods for scanning
      */
-    private class MyScanCallbackImpl(val deviceManager: DeviceManager) : ScanCallback() {
+    private class DeviceManagerScanCallback(val deviceManager: DeviceManager) : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             when(callbackType) {
                 CALLBACK_TYPE_ALL_MATCHES -> println("Callback Type All Matches")
@@ -325,7 +344,7 @@ class DeviceManager(context: Context) {
         // Finally, when the class is constructed, it checks if there were any callbacks retrieved.
         // If there were, then it goes through each of them and sets the now-initialized
         // deviceManager property.
-        private var preconstructedCallbacks: MutableList<MyGattCallbackImpl>? = null
+        private var preconstructedCallbacks: MutableList<DeviceManagerGattCallback>? = null
         init {
             if(preconstructedCallbacks != null) {
                 for(callback in preconstructedCallbacks!!) {
@@ -336,7 +355,7 @@ class DeviceManager(context: Context) {
         }
 
         override fun getGattCallback(): BleManagerGattCallback {
-            val callback = MyGattCallbackImpl(deviceManager)
+            val callback = DeviceManagerGattCallback(deviceManager)
 
             // This, in fact, can be null. Read the wall of comments above
             @Suppress("ConstantConditionIf")
@@ -368,7 +387,7 @@ class DeviceManager(context: Context) {
                 .enqueue()
         }
 
-        private class MyGattCallbackImpl(var deviceManager: DeviceManager?) : BleManagerGattCallback() {
+        private class DeviceManagerGattCallback(var deviceManager: DeviceManager?) : BleManagerGattCallback() {
 
             // I really don't wanna type !! all the time
             val devMan: DeviceManager
