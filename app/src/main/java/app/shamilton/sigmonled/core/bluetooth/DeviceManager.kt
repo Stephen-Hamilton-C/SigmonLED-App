@@ -82,8 +82,10 @@ class DeviceManager(context: Context) {
             val oldValue = field
             field = value
             if(value != null) {
+                isConnecting = false
                 onDeviceConnected.onNext(value)
             } else if (oldValue != null) {
+                isDisconnecting = false
                 onDeviceDisconnected.onNext(oldValue)
             }
         }
@@ -208,11 +210,13 @@ class DeviceManager(context: Context) {
             .useAutoConnect(true)
             .done { bluetoothDevice ->
                 println("Finished connecting")
+                isConnecting = false
                 connectedDevice = bluetoothDevice
 
                 andThen?.invoke(true)
             }
             .fail { bluetoothDevice, status ->
+                isConnecting = false
                 println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
                 // TODO: Need to figure out why this crashes instead of alerts
                 // Also need to figure out how to repro. Seems to happen infrequently
@@ -221,8 +225,6 @@ class DeviceManager(context: Context) {
             }.before {
                 isConnecting = true
                 onAttemptingConnection.onNext(device)
-            }.then {
-                isConnecting = false
             }.enqueue()
         println("Queued connection")
     }
@@ -258,17 +260,19 @@ class DeviceManager(context: Context) {
         previousDevice = connectedDevice
         bleManager.disconnect().done {
             println("Finished disconnecting")
+            isDisconnecting = false
             connectedDevice = null
 
             andThen?.invoke(true)
         }.fail { bluetoothDevice, status ->
+            isDisconnecting = false
             println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
             onDeviceDisconnected.onError(BluetoothDisconnectException(bluetoothDevice, status))
             andThen?.invoke(false)
         }.before {
             isDisconnecting = true
             onAttemptingDisconnect.onNext(it)
-        }.then {
+        }.done {
             isDisconnecting = false
         }.enqueue()
         println("Queued disconnect")
