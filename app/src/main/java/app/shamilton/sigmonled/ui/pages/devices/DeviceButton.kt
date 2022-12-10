@@ -18,7 +18,7 @@ private fun getColor(device: BluetoothDevice): Color {
 }
 
 @Composable
-fun DeviceButton(device: BluetoothDevice) {
+fun DeviceButton(device: BluetoothDevice, modifier: Modifier) {
     // Text color
     var displayNameColor by remember { mutableStateOf(getColor(device)) }
     var connectButtonEnabled by remember { mutableStateOf(true) }
@@ -60,7 +60,7 @@ fun DeviceButton(device: BluetoothDevice) {
     Button(
         onClick = { deviceButtonClicked(device) },
         enabled = connectButtonEnabled,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Text(displayName, color = displayNameColor)
     }

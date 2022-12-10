@@ -46,7 +46,7 @@ object AppScaffold : IComponent {
     private fun Content(modifier: Modifier, navController: NavHostController) {
         NavHost(navController = navController, startDestination = Pages.DEVICES.routeName) {
             composable(Pages.DEVICES.routeName) {
-                DeviceList()
+                DeviceList(modifier)
             }
             composable(Pages.STATIC_COLOR.routeName) {
                 StaticColor(modifier)
