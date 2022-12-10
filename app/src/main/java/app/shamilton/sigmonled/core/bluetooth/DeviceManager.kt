@@ -47,11 +47,11 @@ class DeviceManager(context: Context) {
     /**
      * Called when attempting to connect to a device
      */
-    val onAttemptingConnection = PublishSubject<Nothing?>()
+    val onAttemptingConnection = PublishSubject<BluetoothDevice>()
     /**
      * Called when attempting to disconnect from a device
      */
-    val onAttemptingDisconnect = PublishSubject<Nothing?>()
+    val onAttemptingDisconnect = PublishSubject<BluetoothDevice>()
 
     // Status indicators
     /**
@@ -91,17 +91,9 @@ class DeviceManager(context: Context) {
     val isDisconnected: Boolean
         get() = connectedDevice == null
     var isConnecting: Boolean = false
-        private set(value) {
-            field = value
-            if(value)
-                onAttemptingConnection.onNext(null)
-        }
+        private set
     var isDisconnecting: Boolean = false
-        private set(value) {
-            field = value
-            if(value)
-                onAttemptingDisconnect.onNext(null)
-        }
+        private set
 
     /**
      * The device previously connected to
@@ -225,6 +217,7 @@ class DeviceManager(context: Context) {
                 andThen?.invoke(false)
             }.before {
                 isConnecting = true
+                onAttemptingConnection.onNext(device)
             }.then {
                 isConnecting = false
             }.enqueue()
@@ -271,6 +264,7 @@ class DeviceManager(context: Context) {
             andThen?.invoke(false)
         }.before {
             isDisconnecting = true
+            onAttemptingDisconnect.onNext(it)
         }.then {
             isDisconnecting = false
         }.enqueue()
