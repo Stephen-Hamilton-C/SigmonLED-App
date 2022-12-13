@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         onStarted.onNext(null)
+
+        devMan.scan()
     }
 
     override fun onRestart() {
