@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 /**
  * A representation of a color using RGB, HSV, or HEX
  */
-@Serializable
+@Serializable(with = ColorSerializer::class)
 class Color() {
 
     /**
