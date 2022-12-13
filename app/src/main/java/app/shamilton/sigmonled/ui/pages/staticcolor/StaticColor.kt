@@ -12,14 +12,14 @@ import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.color.Color
 
 @Composable
-fun StaticColor(modifier: Modifier) {
+fun StaticColor(modifier: Modifier, commander: ArduinoCommander) {
     var hue by remember { mutableStateOf(0.0f) }
     var saturation by remember { mutableStateOf(0.0f) }
     var brightness by remember { mutableStateOf(1.0f) }
 
     Column(modifier = modifier.padding(24.dp)) {
         fun apply() {
-            ArduinoCommander.setColor(
+            commander.setColor(
                 Color(
                     hue.toDouble(),
                     saturation.toDouble(),

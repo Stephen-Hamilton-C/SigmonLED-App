@@ -1,13 +1,13 @@
 package app.shamilton.sigmonled.core.preferences
 
+import android.content.Context
 import android.content.SharedPreferences
-import app.shamilton.sigmonled.MainActivity
 import app.shamilton.sigmonled.core.bluetooth.Device
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-object Prefs {
+class Prefs(private val context: Context) {
 
     var autoConnect: Boolean
         get() = getBoolean(Pref.AUTOCONNECT)
@@ -97,7 +97,7 @@ object Prefs {
     }
 
     private fun sharedPrefs(name: PrefName): SharedPreferences {
-        return MainActivity.instance!!.getSharedPreferences(name.value, 0)
+        return context.getSharedPreferences(name.value, 0)
     }
 
 }

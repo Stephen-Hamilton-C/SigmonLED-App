@@ -9,26 +9,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.ArduinoCommander
-import app.shamilton.sigmonled.core.devMan
-import com.badoo.reaktive.observable.subscribe
 
 @Composable
-fun FloatingActionButtons() {
-    val deviceManager = ArduinoCommander.deviceManager
-    var connected by remember { mutableStateOf(deviceManager.isConnected) }
-    devMan.onDeviceConnected.subscribe { connected = true }
-    devMan.onDeviceDisconnected.subscribe { connected = false }
+fun FloatingActionButtons(
+    commander: ArduinoCommander,
+) {
+    val viewModel = commander.deviceManager.getViewModel()
 
-    if(connected) {
+    if(viewModel.isConnected) {
         Column() {
             FloatingActionButton(onClick = {
-                ArduinoCommander.wake()
+                commander.wake()
             }) {
                 Text("On")
             }
             Spacer(modifier = Modifier.height(6.dp))
             FloatingActionButton(onClick = {
-                ArduinoCommander.sleep()
+                commander.sleep()
             }) {
                 Text("Off")
             }

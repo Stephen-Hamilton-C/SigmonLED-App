@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED
 import android.content.Context
 import android.os.ParcelUuid
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
@@ -17,7 +19,7 @@ import kotlin.concurrent.schedule
 /**
  * Handles all low-level Bluetooth Low Energy connections
  */
-class DeviceManager(context: Context) {
+class DeviceManager(private val activity: ComponentActivity) {
 
     // Subjects
     /**
@@ -96,6 +98,9 @@ class DeviceManager(context: Context) {
     var previousDevice: BluetoothDevice? = null
         private set
 
+    /**
+     * A set of the discovered devices by scanning so far
+     */
     val discoveredDevices: Set<BluetoothDevice>
         get() = _discoveredDevices
 
@@ -108,8 +113,9 @@ class DeviceManager(context: Context) {
     private val scanner = BluetoothLeScannerCompat.getScanner()
     private val scannerCallback = DeviceManagerScanCallback(this)
     private val _discoveredDevices = mutableSetOf<BluetoothDevice>()
-    private val bleManager = InternalManager(this, context)
+    private val bleManager = InternalManager(this, activity)
     private var scanningTask: TimerTask? = null
+    private val factory = DeviceManagerViewModel.Factory(this)
 
     // UUIDs
     private val serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")
@@ -146,6 +152,8 @@ class DeviceManager(context: Context) {
             }
         }
     }
+
+    fun getViewModel() = ViewModelProvider(activity, factory)[DeviceManagerViewModel::class.java]
 
     /**
      * Starts a scan for nearby BLE devices.

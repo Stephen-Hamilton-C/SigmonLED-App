@@ -4,49 +4,55 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import app.shamilton.sigmonled.core.devMan
+import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 
-class DeviceManagerViewModel : ViewModel() {
+class DeviceManagerViewModel(val deviceManager: DeviceManager) : ViewModel() {
 
-    var connectedDevice by mutableStateOf(devMan.connectedDevice)
+    var connectedDevice by mutableStateOf(deviceManager.connectedDevice)
         private set
-    var isConnected by mutableStateOf(devMan.isConnected)
+    var isConnected by mutableStateOf(deviceManager.isConnected)
         private set
-    var isDisconnected by mutableStateOf(devMan.isDisconnected)
-        private set
-
-    var isConnecting by mutableStateOf(devMan.isConnecting)
-        private set
-    var isDisconnecting by mutableStateOf(devMan.isDisconnecting)
+    var isDisconnected by mutableStateOf(deviceManager.isDisconnected)
         private set
 
-    var scanning by mutableStateOf(devMan.scanning)
+    var isConnecting by mutableStateOf(deviceManager.isConnecting)
+        private set
+    var isDisconnecting by mutableStateOf(deviceManager.isDisconnecting)
         private set
 
-    var discoveredDevices by mutableStateOf(devMan.discoveredDevices.toList())
+    var scanning by mutableStateOf(deviceManager.scanning)
+        private set
+
+    var discoveredDevices by mutableStateOf(deviceManager.discoveredDevices.toList())
 
     private fun updateConnection() {
-        connectedDevice = devMan.connectedDevice
-        isConnected = devMan.isConnected
-        isDisconnected = devMan.isDisconnected
-        isConnecting = devMan.isConnecting
-        isDisconnecting = devMan.isDisconnecting
+        connectedDevice = deviceManager.connectedDevice
+        isConnected = deviceManager.isConnected
+        isDisconnected = deviceManager.isDisconnected
+        isConnecting = deviceManager.isConnecting
+        isDisconnecting = deviceManager.isDisconnecting
     }
 
     init {
-        devMan.onDeviceConnected.subscribe { updateConnection() }
-        devMan.onDeviceDisconnected.subscribe { updateConnection() }
-        devMan.onAttemptingConnection.subscribe { isConnecting = true }
-        devMan.onAttemptingDisconnect.subscribe {
+        deviceManager.onDeviceConnected.subscribe { updateConnection() }
+        deviceManager.onDeviceDisconnected.subscribe { updateConnection() }
+        deviceManager.onAttemptingConnection.subscribe { isConnecting = true }
+        deviceManager.onAttemptingDisconnect.subscribe {
             isDisconnecting = true
         }
-        devMan.onScanningStarted.subscribe {
+        deviceManager.onScanningStarted.subscribe {
             scanning = true
-            discoveredDevices = devMan.discoveredDevices.toList()
+            discoveredDevices = deviceManager.discoveredDevices.toList()
         }
-        devMan.onScanningStopped.subscribe { scanning = false }
-        devMan.onDeviceFound.subscribe { discoveredDevices = devMan.discoveredDevices.toList() }
+        deviceManager.onScanningStopped.subscribe { scanning = false }
+        deviceManager.onDeviceFound.subscribe { discoveredDevices = deviceManager.discoveredDevices.toList() }
+    }
+
+    class Factory(private val deviceManager: DeviceManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return DeviceManagerViewModel(deviceManager) as T
+        }
     }
 
 }

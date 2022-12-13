@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import app.shamilton.sigmonled.ui.pages.Pages
-import androidx.lifecycle.viewmodel.compose.viewModel
+import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun Menu(navController: NavHostController, viewModel: DeviceManagerViewModel = viewModel()) {
+fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
+    val viewModel = deviceManager.getViewModel()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,

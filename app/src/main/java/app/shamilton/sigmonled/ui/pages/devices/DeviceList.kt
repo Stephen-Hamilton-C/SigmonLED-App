@@ -9,19 +9,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.shamilton.sigmonled.core.ArduinoCommander
-import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 
-private val devMan = ArduinoCommander.deviceManager
 
 @Composable
-fun DeviceList(modifier: Modifier, viewModel: DeviceManagerViewModel = viewModel()) {
-    Column() {
+fun DeviceList(
+    modifier: Modifier,
+    deviceManager: DeviceManager,
+) {
+    val viewModel = deviceManager.getViewModel()
+    Column(modifier = modifier) {
         // List
         if(viewModel.discoveredDevices.isNotEmpty()) {
             for (device in viewModel.discoveredDevices) {
-                DeviceButton(device, modifier)
+                DeviceButton(device, deviceManager)
             }
         } else {
             val text = if(viewModel.scanning)

@@ -1,52 +1,28 @@
 package app.shamilton.sigmonled
 
 import android.Manifest.permission
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import app.shamilton.sigmonled.core.devMan
 import app.shamilton.sigmonled.ui.BluetoothErrorReporter
+import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.scaffold.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
-import com.badoo.reaktive.subject.publish.PublishSubject
 
 
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        var instance: MainActivity? = null
-            private set
-        val onCreated = PublishSubject<Bundle?>()
-        val onStarted = PublishSubject<Nothing?>()
-        val onRestarted = PublishSubject<Nothing?>()
-        val onResumed = PublishSubject<Nothing?>()
-        val onPaused = PublishSubject<Nothing?>()
-        val onStopped = PublishSubject<Nothing?>()
-        val onDestroyed = PublishSubject<Nothing?>()
-    }
+    private val commander: ArduinoCommander by lazy { ArduinoCommander(this) }
 
-    init {
-        if(instance != null) {
-            println("Warning: Another MainActivity exists")
-//            throw IllegalStateException("Multiple MainActivities exist!")
-        }
-        // I think I could just pass the DeviceManager down via parameters
-        instance = this
-    }
-
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        onCreated.onNext(savedInstanceState)
 
-        BluetoothErrorReporter(this)
+        BluetoothErrorReporter(this, commander.deviceManager)
         requestPermissions()
 
         setContent {
@@ -56,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.primary,
                 ) {
-                    AppScaffold.Component()
+                    AppScaffold.Component(commander)
                 }
             }
         }
@@ -64,42 +40,34 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        onStarted.onNext(null)
 
-        devMan.scan()
+        commander.deviceManager.scan()
     }
 
     override fun onRestart() {
         super.onRestart()
 
+        val devMan = commander.deviceManager
         if(devMan.previousDevice != null) {
             devMan.connect(devMan.previousDevice!!)
         }
-
-        onRestarted.onNext(null)
     }
 
     override fun onResume() {
         super.onResume()
-        onResumed.onNext(null)
     }
 
     override fun onPause() {
         super.onPause()
-        onPaused.onNext(null)
     }
 
     override fun onStop() {
         super.onStop()
-
-        devMan.disconnect()
-
-        onStopped.onNext(null)
+        commander.deviceManager.disconnect()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        onDestroyed.onNext(null)
     }
 
     private fun requestPermissions() {
@@ -117,63 +85,3 @@ class MainActivity : ComponentActivity() {
         ActivityCompat.requestPermissions(this, permissions, 1)
     }
 }
-
-
-//@Composable
-//fun Greeting(name: String) {
-//    val deviceManager = ArduinoCommander.deviceManager
-//    var scanning by remember { mutableStateOf(false) }
-//    var canWrite by remember { mutableStateOf(false) }
-//    var discoveredDevice: BluetoothDevice? by remember { mutableStateOf(null) }
-//    deviceManager.onScanningStarted.subscribe {
-//        scanning = true
-//        println("DeviceManager.scanning: ${deviceManager.scanning}")
-//    }
-//    deviceManager.onScanningStopped.subscribe {
-//        scanning = false
-//        println("DeviceManager.scanning: ${deviceManager.scanning}")
-//    }
-//    deviceManager.onDeviceFound.subscribe {
-//        println("Device found")
-//        discoveredDevice = it
-//        deviceManager.stopScan()
-//    }
-//    deviceManager.onDeviceConnected.subscribe {
-//        canWrite = true
-//    }
-//    deviceManager.onDeviceDisconnected.subscribe {
-//        canWrite = false
-//    }
-//    Column() {
-//        val scanButton = Button(onClick = {
-//            deviceManager.scan()
-//        },
-//        enabled = !scanning
-//        ) {
-//            Text("Scan")
-//        }
-//        Button(onClick = {
-//            if(discoveredDevice != null) {
-//                deviceManager.connect(discoveredDevice!!)
-//            } else {
-//                println("DiscoveredDevice is null.")
-//            }
-//        }) {
-//            Text("Connect to first discovered device")
-//        }
-//        Button(onClick = {
-//                         ArduinoCommander.wake()
-//        },
-//            enabled = canWrite
-//        ) {
-//            Text("Wake")
-//        }
-//        Button(onClick = {
-//                         ArduinoCommander.sleep()
-//        },
-//            enabled = canWrite
-//        ) {
-//            Text("Sleep")
-//        }
-//    }
-//}

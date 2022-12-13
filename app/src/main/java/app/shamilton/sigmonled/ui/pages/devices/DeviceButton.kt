@@ -7,35 +7,34 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import app.shamilton.sigmonled.core.devMan
+import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import com.badoo.reaktive.observable.subscribe
 
-private fun getColor(device: BluetoothDevice): Color {
-    return if(devMan.connectedDevice == device)
+private fun getColor(device: BluetoothDevice, deviceManager: DeviceManager): Color {
+    return if(deviceManager.connectedDevice == device)
         Color.Blue
     else
         Color.White
 }
 
 @Composable
-fun DeviceButton(device: BluetoothDevice, modifier: Modifier) {
+fun DeviceButton(
+    device: BluetoothDevice,
+    deviceManager: DeviceManager,
+) {
+    val viewModel = deviceManager.getViewModel()
+
     // Text color
-    var displayNameColor by remember { mutableStateOf(getColor(device)) }
-    var connectButtonEnabled by remember { mutableStateOf(true) }
-    devMan.onDeviceConnected.subscribe {
-        if(it == device) {
-            connectButtonEnabled = true
-            displayNameColor = getColor(device)
-        }
+    // TODO: Get color by viewModel... not sure how exactly
+    var displayNameColor by remember { mutableStateOf(getColor(device, deviceManager)) }
+    deviceManager.onDeviceConnected.subscribe {
+        if(it == device)
+            displayNameColor = getColor(device, deviceManager)
     }
-    devMan.onAttemptingConnection.subscribe { if(it == device) connectButtonEnabled = false }
-    devMan.onDeviceDisconnected.subscribe {
-        if(it == device) {
-            connectButtonEnabled = true
+    deviceManager.onDeviceDisconnected.subscribe {
+        if(it == device)
             displayNameColor = Color.White
-        }
     }
-    devMan.onAttemptingDisconnect.subscribe { if(it == device) connectButtonEnabled = false }
 
     // Text
     // In rare edge cases, the properties of device will be null. Don't ask me how
@@ -47,20 +46,20 @@ fun DeviceButton(device: BluetoothDevice, modifier: Modifier) {
 
     // Connect/Disconnect Button
     fun deviceButtonClicked(device: BluetoothDevice) {
-        if(devMan.connectedDevice === device) {
-            devMan.disconnect()
+        if(deviceManager.connectedDevice === device) {
+            deviceManager.disconnect()
         } else {
-            if(devMan.isConnected) {
-                devMan.disconnect()
+            if(deviceManager.isConnected) {
+                deviceManager.disconnect()
             }
-            devMan.connect(device)
+            deviceManager.connect(device)
         }
     }
 
     Button(
         onClick = { deviceButtonClicked(device) },
-        enabled = connectButtonEnabled,
-        modifier = modifier.fillMaxWidth(),
+        enabled = viewModel.isConnecting || viewModel.isDisconnecting,
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(displayName, color = displayNameColor)
     }
