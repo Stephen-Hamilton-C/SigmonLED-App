@@ -11,8 +11,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.devMan
+import app.shamilton.sigmonled.ui.BluetoothErrorReporter
 import app.shamilton.sigmonled.ui.scaffold.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
 import com.badoo.reaktive.subject.publish.PublishSubject
@@ -34,8 +34,10 @@ class MainActivity : ComponentActivity() {
 
     init {
         if(instance != null) {
-            throw IllegalStateException("Multiple MainActivities exist!")
+            println("Warning: Another MainActivity exists")
+//            throw IllegalStateException("Multiple MainActivities exist!")
         }
+        // I think I could just pass the DeviceManager down via parameters
         instance = this
     }
 
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         onCreated.onNext(savedInstanceState)
 
+        BluetoothErrorReporter(this)
         requestPermissions()
 
         setContent {
