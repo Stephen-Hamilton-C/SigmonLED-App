@@ -1,8 +1,6 @@
 package app.shamilton.sigmonled.core.bluetooth
 
-import android.bluetooth.BluetoothDevice
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -26,7 +24,7 @@ class DeviceManagerViewModel : ViewModel() {
     var scanning by mutableStateOf(devMan.scanning)
         private set
 
-    var discoveredDevices by mutableStateOf(emptyList<BluetoothDevice>())
+    var discoveredDevices by mutableStateOf(devMan.discoveredDevices.toList())
 
     private fun updateConnection() {
         connectedDevice = devMan.connectedDevice
@@ -34,7 +32,6 @@ class DeviceManagerViewModel : ViewModel() {
         isDisconnected = devMan.isDisconnected
         isConnecting = devMan.isConnecting
         isDisconnecting = devMan.isDisconnecting
-        println("connected or disconnected. isDisconnecting: $isDisconnecting-----------------------")
     }
 
     init {
@@ -43,7 +40,6 @@ class DeviceManagerViewModel : ViewModel() {
         devMan.onAttemptingConnection.subscribe { isConnecting = true }
         devMan.onAttemptingDisconnect.subscribe {
             isDisconnecting = true
-            println("disconnecting----------------------------------------------------------------")
         }
         devMan.onScanningStarted.subscribe {
             scanning = true
