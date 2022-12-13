@@ -3,10 +3,10 @@ package app.shamilton.sigmonled.core.bluetooth
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED
 import android.content.Context
 import android.os.ParcelUuid
 import com.badoo.reaktive.observable.subscribe
-import com.badoo.reaktive.subject.behavior.BehaviorSubject
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.support.v18.scanner.*
@@ -41,10 +41,6 @@ class DeviceManager(context: Context) {
      */
     val onDeviceDisconnected = PublishSubject<BluetoothDevice>()
     /**
-     * Called when a device is ready to receive commands
-     */
-    val onDeviceReady = BehaviorSubject<Boolean>(false)
-    /**
      * Called when attempting to connect to a device
      */
     val onAttemptingConnection = PublishSubject<BluetoothDevice>()
@@ -52,16 +48,12 @@ class DeviceManager(context: Context) {
      * Called when attempting to disconnect from a device
      */
     val onAttemptingDisconnect = PublishSubject<BluetoothDevice>()
+    /**
+     * Called when a BluetoothException occurs
+     */
+    val onBluetoothError = PublishSubject<BluetoothException>()
 
     // Status indicators
-    /**
-     * Determines if a device is ready to write to
-     */
-    var ready: Boolean = false
-        private set(value) {
-            field = value
-            onDeviceReady.onNext(value)
-        }
     /**
      * Determines if there is a scan currently happening
      */
@@ -153,9 +145,6 @@ class DeviceManager(context: Context) {
                 println("Disconnected from device: ${it.address}")
             }
         }
-        onDeviceReady.subscribe {
-            println("Device is ${if(!ready) "not " else ""}ready.")
-        }
     }
 
     /**
@@ -176,7 +165,13 @@ class DeviceManager(context: Context) {
         val filters = listOf(
             ScanFilter.Builder().setServiceUuid(ParcelUuid(serviceUUID)).build()
         )
-        scanner.startScan(filters, settings, scannerCallback)
+        try {
+            scanner.startScan(filters, settings, scannerCallback)
+        } catch(iae: IllegalArgumentException) {
+            // TODO: Figure out if this is an issue.
+            // Somehow the "scan already started" is being thrown here and not in the callback
+            onBluetoothError.onNext(BluetoothScanException(SCAN_FAILED_ALREADY_STARTED))
+        }
         scanning = true
         scanningTask = Timer().schedule(15000) {
             if(scanning) {
@@ -198,7 +193,7 @@ class DeviceManager(context: Context) {
     /**
      * Attempts to connect to the given BluetoothDevice.
      * If successful, onDeviceConnected will be called.
-     * Otherwise, the onError will be called and an exception will be sent through onDeviceConnected
+     * Otherwise, the error will be sent through onBluetoothError
      * @param device The BluetoothDevice to connect to.
      * Parameter is true if connection completed successfully.
      * @param andThen Function to run after the device has been connected
@@ -218,9 +213,7 @@ class DeviceManager(context: Context) {
             .fail { bluetoothDevice, status ->
                 isConnecting = false
                 println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
-                // TODO: Need to figure out why this crashes instead of alerts
-                // Also need to figure out how to repro. Seems to happen infrequently
-                onDeviceConnected.onError(BluetoothConnectionException(bluetoothDevice, status))
+                onBluetoothError.onNext(BluetoothConnectionException(bluetoothDevice, status))
                 andThen?.invoke(false)
             }.before {
                 isConnecting = true
@@ -267,7 +260,7 @@ class DeviceManager(context: Context) {
         }.fail { bluetoothDevice, status ->
             isDisconnecting = false
             println("Failed to connect to ${bluetoothDevice.address}. Error status: $status")
-            onDeviceDisconnected.onError(BluetoothDisconnectException(bluetoothDevice, status))
+            onBluetoothError.onNext(BluetoothDisconnectException(bluetoothDevice, status))
             andThen?.invoke(false)
         }.before {
             isDisconnecting = true
@@ -319,7 +312,7 @@ class DeviceManager(context: Context) {
                 SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES -> println("Out of resources (memory?)")
                 else -> println("Unknown error code: $errorCode")
             }
-            deviceManager.onDeviceFound.onError(BluetoothScanException(errorCode))
+            deviceManager.onBluetoothError.onNext(BluetoothScanException(errorCode))
             if(errorCode != SCAN_FAILED_ALREADY_STARTED) {
                 deviceManager.scanning = false
             }
@@ -379,8 +372,7 @@ class DeviceManager(context: Context) {
                 BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
             )
                 .fail { _, status ->
-                    // TODO: Need to somehow report this error
-//                    deviceManager.onBluetoothError.onNext(BluetoothWriteException(status))
+                    deviceManager.onBluetoothError.onNext(BluetoothWriteException(status))
                 }
                 .invalid {
                     println("Not connected to a device. Nothing could be written")
@@ -413,7 +405,6 @@ class DeviceManager(context: Context) {
                 // sometimes writing something to some Control Point.
                 // Kotlin projects should not use suspend methods here, which require a scope.
                 println("Device initialized.")
-                devMan.ready = true
                 // Send the "nevermind" command to reset state
                 devMan.write("x")
             }
@@ -425,7 +416,6 @@ class DeviceManager(context: Context) {
                 println("Services invalidated.")
                 devMan.controlPoint = null
                 devMan.connectedDevice = null
-                devMan.ready = false
             }
         }
     }
