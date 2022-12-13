@@ -86,15 +86,18 @@ fun AppTopBar(viewModel: DeviceManagerViewModel = viewModel()) {
         actions = {
             // Connect button
             val connectEnabled = !viewModel.isConnecting && !viewModel.isDisconnecting && !scanningToConnect
-            println("isConnecting: ${viewModel.isConnecting}, isDisconnecting: ${viewModel.isDisconnecting}, scanningToConnect: $scanningToConnect")
-            println("connectEnabled: $connectEnabled")
+            val loadingIndicatorColor = if(MaterialTheme.colors.isLight)
+                MaterialTheme.colors.secondary
+            else
+                MaterialTheme.colors.primary
+
             IconButton(
                 onClick = { bluetoothButtonClicked() },
                 enabled = connectEnabled,
             ) {
                 Icon(connectIcon, "Connection Status")
                 if(!connectEnabled) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = loadingIndicatorColor)
                 }
             }
 
@@ -105,8 +108,9 @@ fun AppTopBar(viewModel: DeviceManagerViewModel = viewModel()) {
                 enabled = !viewModel.scanning,
             ) {
                 Icon(Icons.Rounded.Search, "Scan")
-                if(viewModel.scanning)
-                    CircularProgressIndicator()
+                if(viewModel.scanning) {
+                    CircularProgressIndicator(color = loadingIndicatorColor)
+                }
             }
         }
     )
