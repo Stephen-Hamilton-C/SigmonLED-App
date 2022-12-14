@@ -24,7 +24,7 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
         for(page in Pages.values()) {
             TextButton(
                 onClick = {
-                    navController.navigate(page.routeName)
+                    navController.navigate(page.route)
                     val drawerState = AppScaffold.scaffoldState.drawerState
                     AppScaffold.scope.launch {
                         if (drawerState.isClosed)
@@ -34,7 +34,7 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !page.disableOnDisconnect || (page.disableOnDisconnect && viewModel.isConnected)
+                enabled = !page.disableOnDisconnect || viewModel.isConnected
             ) {
                 Text(text = page.displayName)
             }

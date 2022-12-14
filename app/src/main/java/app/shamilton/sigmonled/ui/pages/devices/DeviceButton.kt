@@ -56,6 +56,7 @@ fun DeviceButton(
         }
     }
 
+    // TODO: Maybe this should be a ListItem
     Button(
         onClick = { deviceButtonClicked(device) },
         enabled = !viewModel.isConnecting && !viewModel.isDisconnecting,
