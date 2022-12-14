@@ -58,7 +58,7 @@ fun DeviceButton(
 
     Button(
         onClick = { deviceButtonClicked(device) },
-        enabled = viewModel.isConnecting || viewModel.isDisconnecting,
+        enabled = !viewModel.isConnecting && !viewModel.isDisconnecting,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(displayName, color = displayNameColor)
