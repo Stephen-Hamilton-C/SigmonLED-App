@@ -11,7 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.IComponent
 import app.shamilton.sigmonled.ui.pages.Pages
+import app.shamilton.sigmonled.ui.pages.about.AboutPage
 import app.shamilton.sigmonled.ui.pages.devices.DeviceList
+import app.shamilton.sigmonled.ui.pages.palette.PalettePage
 import app.shamilton.sigmonled.ui.pages.staticcolor.StaticColor
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.behavior.BehaviorSubject
@@ -61,6 +63,14 @@ object AppScaffold : IComponent {
             composable(Pages.STATIC_COLOR.route) {
                 onPageNavigation.onNext(Pages.STATIC_COLOR)
                 StaticColor(modifier, commander)
+            }
+            composable(Pages.PALETTE.route) {
+                onPageNavigation.onNext(Pages.PALETTE)
+                PalettePage(modifier, commander)
+            }
+            composable(Pages.ABOUT.route) {
+                onPageNavigation.onNext(Pages.ABOUT)
+                AboutPage(modifier)
             }
         }
     }
