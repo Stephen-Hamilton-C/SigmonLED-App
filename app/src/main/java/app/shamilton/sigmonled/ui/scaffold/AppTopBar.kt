@@ -68,14 +68,13 @@ fun AppTopBar(
     }
 
     fun menuButtonClicked() {
-//        val drawerState = AppScaffold.scaffoldState.drawerState
-//        AppScaffold.scope.launch {
-//            if (drawerState.isClosed)
-//                drawerState.open()
-//            else
-//                drawerState.close()
-//        }
-        AppScaffold.showNav = !AppScaffold.showNav
+        val drawerState = AppScaffold.scaffoldState.drawerState
+        AppScaffold.scope.launch {
+            if (drawerState.isClosed)
+                drawerState.open()
+            else
+                drawerState.close()
+        }
     }
     
     TopAppBar(
