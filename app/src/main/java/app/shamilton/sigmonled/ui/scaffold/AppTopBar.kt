@@ -8,6 +8,7 @@ import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.observable.take
 import kotlinx.coroutines.launch
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
+import app.shamilton.sigmonled.ui.pages.Pages
 
 @Composable
 fun AppTopBar(
@@ -103,14 +104,17 @@ fun AppTopBar(
             }
 
             // Scan button
-            // TODO: Only show on devices page
-            IconButton(
-                onClick = { deviceManager.scan() },
-                enabled = !viewModel.scanning,
-            ) {
-                Icon(Icons.Rounded.Search, "Scan")
-                if(viewModel.scanning) {
-                    CircularProgressIndicator(color = loadingIndicatorColor)
+            var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+            AppScaffold.onPageNavigation.subscribe { currentPage = it }
+            if(currentPage == Pages.DEVICES) {
+                IconButton(
+                    onClick = { deviceManager.scan() },
+                    enabled = !viewModel.scanning,
+                ) {
+                    Icon(Icons.Rounded.Search, "Scan")
+                    if (viewModel.scanning) {
+                        CircularProgressIndicator(color = loadingIndicatorColor)
+                    }
                 }
             }
         }
