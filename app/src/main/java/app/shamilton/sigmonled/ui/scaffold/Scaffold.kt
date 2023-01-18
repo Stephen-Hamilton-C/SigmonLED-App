@@ -13,6 +13,8 @@ import app.shamilton.sigmonled.ui.IComponent
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.ui.pages.devices.DeviceList
 import app.shamilton.sigmonled.ui.pages.staticcolor.StaticColor
+import com.badoo.reaktive.observable.subscribe
+import com.badoo.reaktive.subject.behavior.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -22,6 +24,15 @@ object AppScaffold : IComponent {
         private set
     var scope = CoroutineScope(Dispatchers.Default)
         private set
+    var currentPage = Pages.DEVICES
+        private set
+    val onPageNavigation = BehaviorSubject(currentPage)
+
+    init {
+        onPageNavigation.subscribe { page ->
+            currentPage = page
+        }
+    }
 
     @Composable
     override fun Component(commander: ArduinoCommander) {
@@ -42,11 +53,13 @@ object AppScaffold : IComponent {
 
     @Composable
     private fun Content(modifier: Modifier, navController: NavHostController, commander: ArduinoCommander) {
-        NavHost(navController = navController, startDestination = Pages.DEVICES.route) {
+        NavHost(navController = navController, startDestination = currentPage.route) {
             composable(Pages.DEVICES.route) {
+                onPageNavigation.onNext(Pages.DEVICES)
                 DeviceList(modifier, commander.deviceManager)
             }
             composable(Pages.STATIC_COLOR.route) {
+                onPageNavigation.onNext(Pages.STATIC_COLOR)
                 StaticColor(modifier, commander)
             }
         }
