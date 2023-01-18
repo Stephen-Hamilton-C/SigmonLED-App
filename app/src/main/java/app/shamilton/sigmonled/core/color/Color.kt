@@ -1,9 +1,9 @@
 package app.shamilton.sigmonled.core.color
 
+import com.godaddy.android.colorpicker.HsvColor
 import kotlinx.serialization.Serializable
 
 
-// TODO: Write a custom serializer that only stores the RGBColor
 /**
  * A representation of a color using RGB, HSV, or HEX
  */
@@ -168,6 +168,12 @@ class Color() {
      * @param hsv The HSVColor to create a Color from
      */
     constructor(hsv: HSVColor): this(hsv.h, hsv.s, hsv.v)
+
+    /**
+     * Converts a GoDaddy HsvColor to a SigmonLED Color
+     * @param gdHsv The GoDaddy HsvColor
+     */
+    constructor(gdHsv: HsvColor): this(HSVColor(gdHsv))
 
     /**
      * Creates a Color from a Hexadecimal string

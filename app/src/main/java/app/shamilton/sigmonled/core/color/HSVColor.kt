@@ -1,5 +1,6 @@
 package app.shamilton.sigmonled.core.color
 
+import com.godaddy.android.colorpicker.HsvColor
 import kotlin.math.round
 import kotlinx.serialization.Serializable
 
@@ -16,6 +17,16 @@ data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.
      * Creates a copy of the given HSVColor
      */
     constructor(hsv: HSVColor): this(hsv.h, hsv.s, hsv.v)
+
+    /**
+     * Converts a GoDaddy HsvColor to a SigmonLED HSVColor
+     * @param gdHsv The GoDaddy HsvColor
+     */
+    constructor(gdHsv: HsvColor): this(
+        gdHsv.hue.toDouble() / 360.0,
+        gdHsv.saturation.toDouble(),
+        gdHsv.value.toDouble()
+    )
 
     /**
      * Converts this HSVColor to an RGBColor
@@ -81,5 +92,9 @@ data class HSVColor(var h: Double = 0.0, var s: Double = 0.0, var v: Double = 0.
      */
     fun toHEX(): HEXColor {
         return toRGB().toHEX()
+    }
+
+    fun toGoDaddyHSV(): HsvColor {
+        return HsvColor((h * 360).toFloat(), s.toFloat(), v.toFloat(), 1f)
     }
 }
