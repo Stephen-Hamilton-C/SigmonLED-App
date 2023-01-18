@@ -76,6 +76,7 @@ dependencies {
     implementation "com.godaddy.android.colorpicker:compose-color-picker-android:$color_picker_version"
 
     // Android
+    // TODO: Any Compose UI version > 1.3.1 makes Gradle crash. Look into this.
     def compose_ui_version = "1.3.1"
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
@@ -90,8 +91,8 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test"
     // Use the Kotlin JUnit integration.
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
-    androidTestImplementation "androidx.test.ext:junit:1.1.4"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
