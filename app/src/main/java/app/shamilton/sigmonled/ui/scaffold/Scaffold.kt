@@ -12,9 +12,9 @@ import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.IComponent
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.ui.pages.about.AboutPage
-import app.shamilton.sigmonled.ui.pages.devices.DeviceList
+import app.shamilton.sigmonled.ui.pages.devices.DevicesPage
 import app.shamilton.sigmonled.ui.pages.palette.PalettePage
-import app.shamilton.sigmonled.ui.pages.staticcolor.StaticColor
+import app.shamilton.sigmonled.ui.pages.staticcolor.StaticColorPage
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.behavior.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
@@ -58,11 +58,11 @@ object AppScaffold : IComponent {
         NavHost(navController = navController, startDestination = currentPage.route) {
             composable(Pages.DEVICES.route) {
                 onPageNavigation.onNext(Pages.DEVICES)
-                DeviceList(modifier, commander.deviceManager)
+                DevicesPage(modifier, commander.deviceManager)
             }
             composable(Pages.STATIC_COLOR.route) {
                 onPageNavigation.onNext(Pages.STATIC_COLOR)
-                StaticColor(modifier, commander)
+                StaticColorPage(modifier, commander)
             }
             composable(Pages.PALETTE.route) {
                 onPageNavigation.onNext(Pages.PALETTE)

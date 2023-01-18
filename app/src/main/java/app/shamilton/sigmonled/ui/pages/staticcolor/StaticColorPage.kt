@@ -11,7 +11,7 @@ import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
 
 @Composable
-fun StaticColor(modifier: Modifier, commander: ArduinoCommander) {
+fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
     var currentColor = Color(255, 255, 255)
 
     Column(modifier = modifier.padding(24.dp)) {

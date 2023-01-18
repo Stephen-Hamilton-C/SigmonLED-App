@@ -13,7 +13,7 @@ import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 
 
 @Composable
-fun DeviceList(
+fun DevicesPage(
     modifier: Modifier,
     deviceManager: DeviceManager,
 ) {
