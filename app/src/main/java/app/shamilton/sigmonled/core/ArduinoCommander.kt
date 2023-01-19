@@ -7,14 +7,12 @@ import app.shamilton.sigmonled.core.color.HEXColor
 import app.shamilton.sigmonled.core.palette.DefaultPalette
 import app.shamilton.sigmonled.core.palette.Palette
 import app.shamilton.sigmonled.core.palette.PaletteConfig
-import com.badoo.reaktive.disposable.Disposable
 
 class ArduinoCommander(activity: ComponentActivity) {
 
     val deviceManager = DeviceManager(activity)
 
-    fun setPalette(palette: Palette, config: PaletteConfig) {
-        var d: Disposable? = null
+    fun setPalette(palette: Palette) {
         val command = "C${palette.toString()}#"
         deviceManager.write(command)
     }
