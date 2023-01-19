@@ -84,7 +84,11 @@ fun AppTopBar(
                 Icon(Icons.Rounded.Menu, "Menu")
             }
         },
-        title = { Text("SigmonLED") },
+        title = {
+            var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+            AppScaffold.onPageNavigation.subscribe { currentPage = it }
+            Text(currentPage.displayName)
+        },
         actions = {
             // Connect button
             val connectEnabled = !viewModel.isConnecting && !viewModel.isDisconnecting && !scanningToConnect
