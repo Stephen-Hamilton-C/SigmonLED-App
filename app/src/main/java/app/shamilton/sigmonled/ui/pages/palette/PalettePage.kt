@@ -1,64 +1,42 @@
 package app.shamilton.sigmonled.ui.pages.palette
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.vector.ImageVector
 import app.shamilton.sigmonled.core.ArduinoCommander
-import app.shamilton.sigmonled.core.palette.DefaultPalette
-import app.shamilton.sigmonled.core.palette.PaletteConfig
+
+private enum class PaletteTab(val displayName: String, val icon: ImageVector) {
+    CONTROL("Control", Icons.Rounded.Palette),
+    EDITOR("Editor", Icons.Rounded.Edit),
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PalettePage(modifier: Modifier, commander: ArduinoCommander) {
-
-    Column(modifier = modifier.padding(24.dp)) {
-        var expanded by remember { mutableStateOf(false) }
-        var selectedPalette by remember { mutableStateOf(DefaultPalette.RAINBOW)}
-        var linearBlending by remember { mutableStateOf(true) }
-        var solidPalette by remember { mutableStateOf(false) }
-
-        fun apply() {
-            commander.setPalette(selectedPalette, PaletteConfig(linearBlending, solidPalette))
-        }
-
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            TextField(
-                readOnly = true,
-                value = selectedPalette.name,
-                onValueChange = { },
-                label = { Text("Palette") },
-            )
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                DefaultPalette.values().forEach {
-                    DropdownMenuItem(onClick = {
-                        selectedPalette = it
-                        expanded = false
-                        apply()
-                    }) {
-                        Text(it.name)
-                    }
-                }
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    Column(modifier = modifier) {
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            PaletteTab.values().forEachIndexed { i, tab ->
+                Tab(
+                    text = { Text(tab.displayName) },
+                    selected = selectedTabIndex == i,
+                    onClick = { selectedTabIndex = i },
+                )
             }
         }
-
-        Text("Linear Blending:")
-        Switch(checked = linearBlending, onCheckedChange = {
-            linearBlending = it
-            apply()
-        })
-        Text("Solid Palette:")
-        Switch(checked = solidPalette, onCheckedChange = {
-            solidPalette = it
-            apply()
-        })
-
-        Button(
-            onClick = { apply() }
-        ) {
-            Text("Apply")
+        when(PaletteTab.values()[selectedTabIndex]) {
+            PaletteTab.CONTROL -> {
+                PaletteControlTab(commander)
+            }
+            PaletteTab.EDITOR -> {
+                PaletteEditorTab()
+            }
         }
     }
+
 }
