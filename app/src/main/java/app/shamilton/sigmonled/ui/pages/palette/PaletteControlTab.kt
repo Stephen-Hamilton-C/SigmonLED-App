@@ -1,9 +1,9 @@
 package app.shamilton.sigmonled.ui.pages.palette
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.ArduinoCommander
@@ -43,16 +43,22 @@ fun PaletteControlTab(commander: ArduinoCommander) {
             }
         }
 
-        Text("Linear Blending:")
-        Switch(checked = linearBlending, onCheckedChange = {
-            linearBlending = it
-            apply()
-        })
-        Text("Solid Palette:")
-        Switch(checked = solidPalette, onCheckedChange = {
-            solidPalette = it
-            apply()
-        })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Linear Blending:")
+            Spacer(Modifier.fillMaxWidth())
+            Switch(checked = linearBlending, onCheckedChange = {
+                linearBlending = it
+                apply()
+            })
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Solid Palette:")
+            Spacer(Modifier.fillMaxWidth())
+            Switch(checked = solidPalette, onCheckedChange = {
+                solidPalette = it
+                apply()
+            })
+        }
 
         Button(
             onClick = { apply() }
