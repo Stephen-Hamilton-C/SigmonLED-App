@@ -15,6 +15,6 @@ enum class Pages(
 ) {
     DEVICES("Devices", "home", Icons.Rounded.Devices, false),
     STATIC_COLOR("Static Color", "staticcolor", Icons.Rounded.WbIncandescent, true),
-    PALETTE("Palette", "palette", Icons.Rounded.Palette, true),
+    PALETTE("Palette", "palette", Icons.Rounded.Palette, false),
     ABOUT("About", "about", Icons.Rounded.Info, false),
 }
