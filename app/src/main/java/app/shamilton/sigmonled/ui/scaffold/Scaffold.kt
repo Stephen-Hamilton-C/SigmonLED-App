@@ -42,6 +42,13 @@ object AppScaffold : IComponent {
         scope = rememberCoroutineScope()
         val navController = rememberNavController()
 
+        // Go to Devices page if device disconnecting while in a connected-only page
+        commander.deviceManager.onDeviceDisconnected.subscribe {
+            if(currentPage.disableOnDisconnect) {
+                navController.navigate(Pages.DEVICES.route)
+            }
+        }
+
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { AppTopBar(commander.deviceManager) },
