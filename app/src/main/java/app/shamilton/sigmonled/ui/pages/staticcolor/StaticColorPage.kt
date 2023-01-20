@@ -23,5 +23,7 @@ fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
                 commander.setColor(currentColor)
             }
         )
+        // TODO: Add row of common colors
+        // TODO: Make a user-defined color palette
     }
 }
