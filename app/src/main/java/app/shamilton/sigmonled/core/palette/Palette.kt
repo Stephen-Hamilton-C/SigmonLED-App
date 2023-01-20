@@ -9,10 +9,18 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Palette(
-    private val colors: List<Color>
+    val name: String,
+    var colors: List<Color>,
 ) {
 
-    constructor(vararg colors: Color) : this(colors.asList())
+    val canExpand: Boolean
+        get() = colors.size <= 16
+    val canShrink: Boolean
+        get() = colors.size > 1
+
+    constructor(name: String, vararg colors: Color) : this(name, colors.asList())
+    constructor(vararg colors: Color) : this("Untitled", colors.asList())
+    constructor() : this("Untitled", listOf(Color.BLACK))
 
     init {
         // Sanity check: A palette must have 16 colors, or be a multiple of 16
@@ -40,6 +48,38 @@ data class Palette(
             fullPalette.addAll(colors)
         }
         return fullPalette
+    }
+
+    /**
+     * Expands the amount of colors in this Palette
+     * @throws IllegalStateException If canExpand is false
+     */
+    fun expand() {
+        if(!canExpand)
+            throw IllegalStateException("Cannot expand a palette with 16 colors!")
+
+        val expandedColors = colors.toMutableList()
+        do {
+            expandedColors.add(Color.BLACK)
+        } while(16 % expandedColors.size != 0)
+
+        colors = expandedColors
+    }
+
+    /**
+     * Shrinks the amount of colors in this palette
+     * @throws IllegalStateException If canShrink is false
+     */
+    fun shrink() {
+        if(!canShrink)
+            throw IllegalStateException("Cannot shrink a palette with only 1 color!")
+
+        val shrunkColors = colors.toMutableList()
+        do {
+            shrunkColors.removeLast()
+        } while(16 % shrunkColors.size != 0)
+
+        colors = shrunkColors
     }
 
     /**
