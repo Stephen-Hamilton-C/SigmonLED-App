@@ -27,10 +27,7 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
                     navController.navigate(page.route)
                     val drawerState = AppScaffold.scaffoldState.drawerState
                     AppScaffold.scope.launch {
-                        if (drawerState.isClosed)
-                            drawerState.open()
-                        else
-                            drawerState.close()
+                        drawerState.close()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
