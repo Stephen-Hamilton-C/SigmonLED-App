@@ -192,6 +192,12 @@ class Color() {
      */
     constructor(hex: HEXColor): this(hex.toString())
 
+    /**
+     * Creates a Color from an Android Color
+     */
+    constructor(color: androidx.compose.ui.graphics.Color):
+            this(color.red.toInt(), color.green.toInt(), color.blue.toInt())
+
     companion object {
         val BLACK = Color(0, 0, 0)
         val BLUE = Color(0, 0, 255)
@@ -208,6 +214,14 @@ class Color() {
         val YELLOW = Color(255, 255, 0)
     }
 
-    override fun equals(other: Any?): Boolean = other is Color && rgb == other.rgb
-    override fun hashCode(): Int = rgb.hashCode()
+    /**
+     * Converts this Color to an Android Color
+     */
+    fun toAndroidColor(): androidx.compose.ui.graphics.Color {
+        return androidx.compose.ui.graphics.Color(rgb.r, rgb.g, rgb.b)
+    }
+
+    override fun equals(other: Any?): Boolean = other is Color && hsv == other.hsv
+    override fun hashCode(): Int = hsv.hashCode()
+
 }
