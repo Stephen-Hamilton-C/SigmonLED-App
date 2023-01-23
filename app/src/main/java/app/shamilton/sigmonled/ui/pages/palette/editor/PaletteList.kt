@@ -50,7 +50,10 @@ fun CustomPaletteItem(
 ) {
     Row() {
         Text(palette.name)
-        IconButton(onClick = { commander.setPalette(palette) }) {
+        IconButton(
+            onClick = { commander.setPalette(palette) },
+            enabled = commander.deviceManager.getViewModel().isConnected
+        ) {
             Icon(Icons.Rounded.Upload, "Upload")
         }
         IconButton(onClick = {
