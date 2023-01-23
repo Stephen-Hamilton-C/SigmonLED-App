@@ -9,18 +9,31 @@ import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.color.Color
 import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
+import kotlin.concurrent.timer
+
+var currentColor = Color(255, 255, 255)
+var colorChanged = false
+var timerCreated = false
 
 @Composable
 fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
-    var currentColor = Color(255, 255, 255)
+    if(!timerCreated) {
+        timerCreated = true
+        timer(period = 10L) {
+            if(colorChanged) {
+                colorChanged = false
+                commander.setColor(currentColor)
+            }
+        }
+    }
 
-    Column(modifier = modifier.padding(24.dp)) {
+    Column(modifier = modifier.padding(24.dp).padding(bottom = 132.dp)) {
         ClassicColorPicker(
             showAlphaBar = false,
             color = currentColor.hsv.toGoDaddyHSV(),
             onColorChanged = { color: HsvColor ->
+                colorChanged = true
                 currentColor = Color(color)
-                commander.setColor(currentColor)
             }
         )
         // TODO: Add row of common colors
