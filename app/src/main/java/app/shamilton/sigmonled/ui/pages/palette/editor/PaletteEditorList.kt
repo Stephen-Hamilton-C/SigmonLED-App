@@ -19,11 +19,12 @@ import app.shamilton.sigmonled.core.palette.Palette
 fun PaletteList(viewModel: PaletteEditorTabModel, commander: ArduinoCommander) {
     Column() {
         val currentContext = LocalContext.current
-        viewModel.savedPalettes.forEach { palette ->
+        viewModel.savedPalettes.forEachIndexed { i, palette ->
             CustomPaletteItem(
-                palette,
-                viewModel,
-                commander,
+                palette = palette,
+                index = i,
+                viewModel = viewModel,
+                commander = commander,
                 onDelete = {
                     viewModel.savedPalettes.remove(palette)
                     savePalettes(currentContext, viewModel.savedPalettes)
@@ -33,6 +34,7 @@ fun PaletteList(viewModel: PaletteEditorTabModel, commander: ArduinoCommander) {
     }
     Button(onClick = {
         viewModel.selectedPalette = Palette()
+        viewModel.selectedPaletteIndex = -1
     }) {
         Text("New Palette")
     }
@@ -41,6 +43,7 @@ fun PaletteList(viewModel: PaletteEditorTabModel, commander: ArduinoCommander) {
 @Composable
 fun CustomPaletteItem(
     palette: Palette,
+    index: Int,
     viewModel: PaletteEditorTabModel,
     commander: ArduinoCommander,
     onDelete: () -> Unit = {},
@@ -50,10 +53,13 @@ fun CustomPaletteItem(
         IconButton(onClick = { commander.setPalette(palette) }) {
             Icon(Icons.Rounded.Upload, "Upload")
         }
-        IconButton(onClick = { viewModel.selectedPalette = palette }) {
+        IconButton(onClick = {
+            viewModel.selectedPalette = palette
+            viewModel.selectedPaletteIndex = index
+        }) {
             Icon(Icons.Rounded.Edit, "Edit")
         }
-        IconButton(onClick = { onDelete() }) {
+        IconButton(onClick = onDelete) {
             Icon(Icons.Rounded.Delete, "Delete")
         }
     }

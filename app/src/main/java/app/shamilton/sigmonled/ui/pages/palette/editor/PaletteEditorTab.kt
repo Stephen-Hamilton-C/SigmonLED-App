@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 
 class PaletteEditorTabModel() : ViewModel() {
     var selectedPalette: Palette? by mutableStateOf(null)
+    var selectedPaletteIndex: Int by mutableStateOf(-1)
     var savedPalettes: MutableList<Palette> = mutableStateListOf()
 }
 
@@ -45,6 +46,22 @@ fun PaletteEditorTab(commander: ArduinoCommander) {
     if(viewModel.selectedPalette == null) {
         PaletteList(viewModel, commander)
     } else {
-        PaletteEditor(viewModel)
+        val currentContext = LocalContext.current
+        PaletteEditor(
+            viewModel,
+            onSave = {
+                viewModel.selectedPalette?.let { selectedPalette ->
+                    if(viewModel.selectedPaletteIndex in 0..viewModel.savedPalettes.size) {
+                        // Save existing palette
+                        viewModel.savedPalettes[viewModel.selectedPaletteIndex] = selectedPalette
+                    } else {
+                        // Save new palette
+                        viewModel.savedPalettes.add(selectedPalette)
+                    }
+                    viewModel.selectedPalette = null
+                    savePalettes(currentContext, viewModel.savedPalettes)
+                }
+            },
+        )
     }
 }

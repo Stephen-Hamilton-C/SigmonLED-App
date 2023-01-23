@@ -10,17 +10,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Palette(
     val name: String,
-    var colors: List<Color>,
+    val colors: List<Color>,
 ) {
 
     val canExpand: Boolean
-        get() = colors.size <= 16
+        get() = colors.size < 16
     val canShrink: Boolean
         get() = colors.size > 1
 
-    constructor(name: String, vararg colors: Color) : this(name, colors.asList())
-    constructor(vararg colors: Color) : this("Untitled", colors.asList())
-    constructor() : this("Untitled", listOf(Color.BLACK))
+    constructor(name: String, vararg colors: Color) : this(name, colors.toMutableList())
+    constructor(vararg colors: Color) : this("Untitled", colors.toMutableList())
+    constructor() : this("Untitled", mutableListOf(Color.BLACK, Color.BLACK))
 
     init {
         // Sanity check: A palette must have 16 colors, or be a multiple of 16
@@ -53,8 +53,9 @@ data class Palette(
     /**
      * Expands the amount of colors in this Palette
      * @throws IllegalStateException If canExpand is false
+     * @return A copy of this Palette with expanded colors
      */
-    fun expand() {
+    fun expand(): Palette {
         if(!canExpand)
             throw IllegalStateException("Cannot expand a palette with 16 colors!")
 
@@ -63,14 +64,15 @@ data class Palette(
             expandedColors.add(Color.BLACK)
         } while(16 % expandedColors.size != 0)
 
-        colors = expandedColors
+        return Palette(name, expandedColors)
     }
 
     /**
      * Shrinks the amount of colors in this palette
      * @throws IllegalStateException If canShrink is false
+     * @return A copy of this Palette with shrunk colors
      */
-    fun shrink() {
+    fun shrink(): Palette {
         if(!canShrink)
             throw IllegalStateException("Cannot shrink a palette with only 1 color!")
 
@@ -79,7 +81,25 @@ data class Palette(
             shrunkColors.removeLast()
         } while(16 % shrunkColors.size != 0)
 
-        colors = shrunkColors
+        return Palette(name, shrunkColors)
+    }
+
+    /**
+     * Creates a new Palette with the new name and same colors
+     * @return A copy of this Palette with the changed name
+     */
+    fun changeName(name: String): Palette {
+        return Palette(name, colors)
+    }
+
+    /**
+     * Creates a new Palette with the color changed at the specified index
+     * @return A copy of this Palette with the changed color
+     */
+    fun changeColor(index: Int, color: Color): Palette {
+        val mutableColors = colors.toMutableList()
+        mutableColors[index] = color
+        return Palette(name, mutableColors)
     }
 
     /**
