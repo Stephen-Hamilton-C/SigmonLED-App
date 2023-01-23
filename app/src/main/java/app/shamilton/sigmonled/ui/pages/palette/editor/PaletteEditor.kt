@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.color.Color
 import app.shamilton.sigmonled.core.palette.Palette
@@ -16,7 +17,7 @@ import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
 
 @Composable
-fun PaletteEditor(viewModel: PaletteEditorTabModel, onSave: () -> Unit) {
+fun PaletteEditor(viewModel: PaletteEditorTabModel) {
     viewModel.selectedPalette?.let { selectedPalette ->
         var currentColorIndex: Int by remember { mutableStateOf(-1) }
         var name: String by remember { mutableStateOf(selectedPalette.name) }
@@ -32,11 +33,25 @@ fun PaletteEditor(viewModel: PaletteEditorTabModel, onSave: () -> Unit) {
                     viewModel.selectedPalette = selectedPalette.shrink()
                 }
             )
+            val currentContext = LocalContext.current
             Button(onClick = {
                 // Change name first if it has been changed
                 if(selectedPalette.name != name)
                     viewModel.selectedPalette = selectedPalette.changeName(name)
-                onSave()
+
+                viewModel.selectedPalette?.let {
+                    if (viewModel.selectedPaletteIndex in 0..viewModel.savedPalettes.size) {
+                        // Save existing palette
+                        viewModel.savedPalettes[viewModel.selectedPaletteIndex] = it
+                    } else {
+                        // Save new palette
+                        viewModel.savedPalettes.add(it)
+                    }
+                }
+
+                // Go back to palette list and write changes
+                viewModel.selectedPalette = null
+                savePalettes(currentContext, viewModel.savedPalettes)
             }) {
                 Text("Save")
             }
@@ -97,7 +112,7 @@ fun PaletteColorList(palette: Palette, onColorIndexSelected: (Int) -> Unit, onEx
 fun PaletteColorPicker(defaultColor: Color = Color.BLACK, onSave: (Color) -> Unit, onExit: () -> Unit) {
     var currentColor: Color by remember { mutableStateOf(defaultColor) }
     ClassicColorPicker(
-        modifier = Modifier.fillMaxHeight(0.75f),
+        modifier = Modifier.fillMaxHeight(0.75f).padding(12.dp),
         showAlphaBar = false,
         color = currentColor.hsv.toGoDaddyHSV(),
         onColorChanged = { color: HsvColor ->

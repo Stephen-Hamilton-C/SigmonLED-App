@@ -1,7 +1,6 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
 import android.content.Context
-import android.graphics.Color
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.platform.LocalContext
@@ -46,22 +45,6 @@ fun PaletteEditorTab(commander: ArduinoCommander) {
     if(viewModel.selectedPalette == null) {
         PaletteList(viewModel, commander)
     } else {
-        val currentContext = LocalContext.current
-        PaletteEditor(
-            viewModel,
-            onSave = {
-                viewModel.selectedPalette?.let { selectedPalette ->
-                    if(viewModel.selectedPaletteIndex in 0..viewModel.savedPalettes.size) {
-                        // Save existing palette
-                        viewModel.savedPalettes[viewModel.selectedPaletteIndex] = selectedPalette
-                    } else {
-                        // Save new palette
-                        viewModel.savedPalettes.add(selectedPalette)
-                    }
-                    viewModel.selectedPalette = null
-                    savePalettes(currentContext, viewModel.savedPalettes)
-                }
-            },
-        )
+        PaletteEditor(viewModel)
     }
 }
