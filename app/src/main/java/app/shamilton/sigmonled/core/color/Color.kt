@@ -223,5 +223,8 @@ class Color() {
 
     override fun equals(other: Any?): Boolean = other is Color && hsv == other.hsv
     override fun hashCode(): Int = hsv.hashCode()
+    override fun toString(): String {
+        return "Color { R: $r, G: $g, B: $b | H: ${h * 360}, S: ${s * 255}, V: ${v * 255} | HEX: $hex }"
+    }
 
 }
