@@ -13,8 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.color.Color
 import app.shamilton.sigmonled.core.palette.Palette
-import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
+import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
+import com.godaddy.android.colorpicker.harmony.HarmonyColorPicker
 
 @Composable
 fun PaletteEditor(viewModel: PaletteEditorTabModel) {
@@ -111,14 +112,21 @@ fun PaletteColorList(palette: Palette, onColorIndexSelected: (Int) -> Unit, onEx
 @Composable
 fun PaletteColorPicker(defaultColor: Color = Color.BLACK, onSave: (Color) -> Unit, onExit: () -> Unit) {
     var currentColor: Color by remember { mutableStateOf(defaultColor) }
-    ClassicColorPicker(
+//    ClassicColorPicker(
+//        modifier = Modifier.fillMaxHeight(0.75f).padding(12.dp),
+//        showAlphaBar = false,
+//        color = currentColor.hsv.toGoDaddyHSV(),
+//        onColorChanged = { color: HsvColor ->
+//            currentColor = Color(color)
+//        }
+//    )
+    HarmonyColorPicker(
         modifier = Modifier.fillMaxHeight(0.75f).padding(12.dp),
-        showAlphaBar = false,
+        harmonyMode = ColorHarmonyMode.NONE,
         color = currentColor.hsv.toGoDaddyHSV(),
         onColorChanged = { color: HsvColor ->
             currentColor = Color(color)
-        }
-    )
+        })
     Button(onClick = {
         onSave(currentColor)
     }) {
