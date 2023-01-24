@@ -9,9 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.color.Color
-import com.godaddy.android.colorpicker.HsvColor
-import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
-import com.godaddy.android.colorpicker.harmony.HarmonyColorPicker
+import app.shamilton.sigmonled.ui.ColorPicker
 import kotlin.concurrent.timer
 
 var colorChanged = false
@@ -41,23 +39,12 @@ fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
         }) {
             Text("Warm")
         }
-        HarmonyColorPicker(
-            harmonyMode = ColorHarmonyMode.NONE,
-            color = currentColor.hsv.toGoDaddyHSV(),
-            onColorChanged = { color: HsvColor ->
+        ColorPicker(
+            color = currentColor,
+            onColorChanged = { color ->
                 colorChanged = true
-                currentColor = Color(color)
-            })
-//        ClassicColorPicker(
-//            showAlphaBar = false,
-//            color = currentColor.hsv.toGoDaddyHSV(),
-//            onColorChanged = { color: HsvColor ->
-//                colorChanged = true
-//                currentColor = Color(color)
-//            }
-//        )
-
-        // TODO: Add row of common colors
-        // TODO: Make a user-defined color palette
+                currentColor = color
+            }
+        )
     }
 }
