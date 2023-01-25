@@ -1,4 +1,4 @@
-package app.shamilton.sigmonled.ui.pages.staticcolor
+package app.shamilton.sigmonled.ui.picker
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf

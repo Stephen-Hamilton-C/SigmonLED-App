@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.color.Color
-import app.shamilton.sigmonled.ui.ColorPicker
+import app.shamilton.sigmonled.ui.picker.ColorPicker
 
 @Composable
 fun PaletteColorSelector(defaultColor: Color = Color.BLACK, onSave: (Color) -> Unit, onExit: () -> Unit) {
