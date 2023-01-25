@@ -13,7 +13,7 @@ import app.shamilton.sigmonled.core.ArduinoCommander
 fun PaletteEditorTab(commander: ArduinoCommander) {
     val viewModel: PaletteEditorModel = viewModel()
     if(viewModel.savedPalettes.isEmpty())
-        viewModel.savedPalettes = loadPalettes(LocalContext.current)
+        viewModel.load(LocalContext.current)
 
     if(viewModel.selectedPalette == null) {
         PaletteList(viewModel, commander)

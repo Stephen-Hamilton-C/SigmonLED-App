@@ -32,7 +32,7 @@ fun PaletteList(viewModel: PaletteEditorModel, commander: ArduinoCommander) {
                 onDelete = {
                     // Remove the palette and save
                     viewModel.savedPalettes.remove(palette)
-                    savePalettes(currentContext, viewModel.savedPalettes)
+                    viewModel.save(currentContext)
                 }
             )
         }

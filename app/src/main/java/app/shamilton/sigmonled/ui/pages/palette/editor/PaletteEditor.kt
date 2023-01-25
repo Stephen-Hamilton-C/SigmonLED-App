@@ -47,7 +47,7 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
 
                 // Go back to palette list and write changes
                 viewModel.selectedPalette = null
-                savePalettes(currentContext, viewModel.savedPalettes)
+                viewModel.save(currentContext)
             }) {
                 Text("Save")
             }
