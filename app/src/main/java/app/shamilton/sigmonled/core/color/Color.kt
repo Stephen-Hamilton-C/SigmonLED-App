@@ -181,7 +181,7 @@ class Color() {
      * @throws IllegalArgumentException if the Hex string is not 7 characters long or is not in the format of "#000000"
      */
     constructor(hexString: String): this() {
-        hex = HEXColor(hexString)
+        hex = HEXColor(hexString.uppercase())
         rgb = hex.toRGB()
         hsv = rgb.toHSV()
     }
