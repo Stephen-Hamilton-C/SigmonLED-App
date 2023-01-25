@@ -1,6 +1,7 @@
 package app.shamilton.sigmonled.ui
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -14,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 
 // TODO: Need better name for incrementDelta
@@ -32,10 +34,14 @@ fun NumberInput(
     }
 
     Row() {
-        Button(onClick = { setNumber(number - incrementDelta) }) {
+        Button(
+            modifier = Modifier.fillMaxWidth(0.2f),
+            onClick = { setNumber(number - incrementDelta) },
+        ) {
             Icon(Icons.Rounded.Remove, "Decrement")
         }
         TextField(
+            modifier = Modifier.fillMaxWidth(0.75f),
             label = { Text(label) },
             value = number.toString(),
             onValueChange = {
@@ -45,7 +51,10 @@ fun NumberInput(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
-        Button(onClick = { setNumber(number + incrementDelta) }) {
+        Button(
+            modifier = Modifier.fillMaxWidth(1f),
+            onClick = { setNumber(number + incrementDelta) },
+        ) {
             Icon(Icons.Rounded.Add, "Increment")
         }
     }
