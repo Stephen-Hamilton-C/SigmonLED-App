@@ -23,12 +23,14 @@ class PaletteEditorModel() : ViewModel() {
             .apply()
     }
 
-    fun load(context: Context) {
+    fun load(context: Context): PaletteEditorModel {
         val prefs = context.getSharedPreferences(PrefKeys.dataFile, 0)
         val palettesData = prefs.getString(PrefKeys.savedPalettes, "")
         savedPalettes = if (palettesData.isNullOrEmpty())
             mutableStateListOf()
         else
-            Json.decodeFromString(palettesData)
+            Json.decodeFromString<MutableList<Palette>>(palettesData).toMutableStateList()
+
+        return this
     }
 }
