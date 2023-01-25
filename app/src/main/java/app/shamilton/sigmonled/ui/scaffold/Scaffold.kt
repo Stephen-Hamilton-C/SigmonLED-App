@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.shamilton.sigmonled.core.ArduinoCommander
-import app.shamilton.sigmonled.ui.IComponent
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.ui.pages.about.AboutPage
 import app.shamilton.sigmonled.ui.pages.devices.DevicesPage
@@ -20,7 +19,7 @@ import com.badoo.reaktive.subject.behavior.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-object AppScaffold : IComponent {
+object AppScaffold {
 
     var scaffoldState = ScaffoldState(DrawerState(DrawerValue.Closed), SnackbarHostState())
         private set
@@ -37,7 +36,7 @@ object AppScaffold : IComponent {
     }
 
     @Composable
-    override fun Component(commander: ArduinoCommander) {
+    fun Component(commander: ArduinoCommander) {
         scaffoldState = rememberScaffoldState()
         scope = rememberCoroutineScope()
         val navController = rememberNavController()
