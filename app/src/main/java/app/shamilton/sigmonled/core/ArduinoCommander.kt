@@ -19,7 +19,6 @@ class ArduinoCommander(activity: ComponentActivity) {
         set(value) {
             field = value
             onAutoConnectStateChanged.onNext(value)
-            println("Changed state to $value")
         }
 
     fun setPalette(palette: Palette) {
