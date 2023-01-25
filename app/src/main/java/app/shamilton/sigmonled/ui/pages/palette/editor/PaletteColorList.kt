@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -23,7 +21,6 @@ fun PaletteColorList(
     onShrink: () -> Unit,
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
         columns = GridCells.Fixed(4),
     ) {
         items(palette.colors.size) { i ->

@@ -2,6 +2,8 @@ package app.shamilton.sigmonled.ui.pages.palette.editor
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.palette.Palette
@@ -20,7 +23,7 @@ import app.shamilton.sigmonled.core.palette.Palette
  */
 @Composable
 fun PaletteList(viewModel: PaletteEditorModel, commander: ArduinoCommander) {
-    Column() {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         // Create list
         val currentContext = LocalContext.current
         viewModel.savedPalettes.forEachIndexed { i, palette ->
