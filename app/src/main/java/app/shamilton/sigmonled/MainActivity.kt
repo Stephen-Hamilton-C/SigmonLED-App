@@ -36,6 +36,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        // TODO: Autoconnect here
+        // Same BluetoothException as onRestart.
     }
 
     override fun onStart() {
@@ -47,6 +50,9 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
 
+        // TODO: Autoconnect here.
+        // Problem is, a BluetoothException is being thrown here
+        // Maybe a race condition?
         val devMan = commander.deviceManager
         if(devMan.previousDevice != null) {
             devMan.connect(devMan.previousDevice!!)

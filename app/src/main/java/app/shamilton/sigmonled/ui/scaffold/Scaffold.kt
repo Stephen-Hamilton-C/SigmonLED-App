@@ -50,7 +50,7 @@ object AppScaffold {
 
         Scaffold(
             scaffoldState = scaffoldState,
-            topBar = { AppTopBar(commander.deviceManager) },
+            topBar = { AppTopBar(commander) },
             drawerContent = { Menu(navController, commander.deviceManager) },
             floatingActionButton = { FloatingActionButtons(commander = commander) },
             floatingActionButtonPosition = FabPosition.End,

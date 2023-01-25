@@ -7,10 +7,20 @@ import app.shamilton.sigmonled.core.color.HEXColor
 import app.shamilton.sigmonled.core.palette.DefaultPalette
 import app.shamilton.sigmonled.core.palette.Palette
 import app.shamilton.sigmonled.core.palette.PaletteConfig
+import com.badoo.reaktive.observable.subscribe
+import com.badoo.reaktive.observable.take
+import com.badoo.reaktive.subject.publish.PublishSubject
 
 class ArduinoCommander(activity: ComponentActivity) {
 
     val deviceManager = DeviceManager(activity)
+    val onAutoConnectStateChanged = PublishSubject<AutoConnectState>()
+    private var _autoConnectState = AutoConnectState.FINISHED
+        set(value) {
+            field = value
+            onAutoConnectStateChanged.onNext(value)
+            println("Changed state to $value")
+        }
 
     fun setPalette(palette: Palette) {
         val command = "C${palette.toString()}#"
@@ -55,6 +65,46 @@ class ArduinoCommander(activity: ComponentActivity) {
 
         val command = "d${delay.toHexPadded(3)}"
         deviceManager.write(command)
+    }
+
+    fun autoConnect() {
+        if(_autoConnectState != AutoConnectState.FINISHED) return
+        if(deviceManager.isConnected) return
+
+        if(deviceManager.previousDevice != null) {
+            // Previously connected to a device, connect to that one
+            deviceManager.previousDevice?.let { deviceManager.connect(it) }
+        } else if(deviceManager.discoveredDevices.isNotEmpty()) {
+            // No previously connected devices, but there are discovered devices...
+            // Let's connect to the first device
+            deviceManager.connect(deviceManager.discoveredDevices.first())
+        } else {
+            // No previously connected devices, and none found yet
+
+            // Prepare events
+            deviceManager.onScanningStopped.take(1).subscribe {
+                if(!deviceManager.isConnected && !deviceManager.isConnecting) {
+                    // No devices found. We're finished.
+                    _autoConnectState = AutoConnectState.FINISHED
+                }
+            }
+            deviceManager.onDeviceFound.take(1).subscribe {
+                // Device found, connect to it
+                _autoConnectState = AutoConnectState.CONNECTING
+                deviceManager.connect(it)
+                deviceManager.stopScan()
+            }
+            deviceManager.onDeviceConnected.take(1).subscribe {
+                // Device connected. We're finished.
+                _autoConnectState = AutoConnectState.FINISHED
+            }
+
+            // Indicate we're scanning to connect
+            _autoConnectState = AutoConnectState.SCANNING
+            // Only start scan if one isn't running already
+            if(!deviceManager.scanning)
+                deviceManager.scan()
+        }
     }
 
     fun sleep() {
