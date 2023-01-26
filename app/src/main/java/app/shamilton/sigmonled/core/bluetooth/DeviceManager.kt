@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.ktx.suspend
+import no.nordicsemi.android.ble.ktx.suspendForResponse
 import no.nordicsemi.android.support.v18.scanner.*
 import no.nordicsemi.android.support.v18.scanner.ScanSettings.*
 import java.util.*
@@ -287,6 +289,10 @@ class DeviceManager(private val activity: ComponentActivity) {
         bleManager.write(command)
     }
 
+    fun read(onRead: (ByteArray?) -> Unit) {
+        bleManager.read(onRead)
+    }
+
     /**
      * Callback methods for scanning
      */
@@ -368,6 +374,12 @@ class DeviceManager(private val activity: ComponentActivity) {
             }
 
             return callback
+        }
+
+        fun read(onRead: (ByteArray?) -> Unit) {
+            super.readCharacteristic(deviceManager.controlPoint).with { _, data ->
+                onRead(data.value)
+            }.enqueue()
         }
 
         /**
