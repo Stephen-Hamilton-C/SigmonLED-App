@@ -73,7 +73,7 @@ fun CustomPaletteItem(
         // Upload button
         IconButton(
             onClick = { commander.setPalette(palette) },
-            enabled = commander.deviceManager.getViewModel().isConnected
+            enabled = commander.deviceManager.getViewModel().isConnected && !commander.isUploadingPalette
         ) {
             Icon(Icons.Rounded.Upload, "Upload")
         }

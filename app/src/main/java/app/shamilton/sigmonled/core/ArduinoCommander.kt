@@ -15,15 +15,22 @@ class ArduinoCommander(activity: ComponentActivity) {
 
     val deviceManager = DeviceManager(activity)
     val onAutoConnectStateChanged = PublishSubject<AutoConnectState>()
+    val isUploadingPalette: Boolean
+        get() = _currentUploadTask?.isRunning ?: false
     private var _autoConnectState = AutoConnectState.FINISHED
         set(value) {
             field = value
             onAutoConnectStateChanged.onNext(value)
         }
+    private var _currentUploadTask: PaletteUploadTask? = null
 
-    fun setPalette(palette: Palette) {
-        val command = "C${palette.toString()}#"
-        deviceManager.write(command)
+    fun setPalette(palette: Palette, onFinished: () -> Unit = {}) {
+        if(_currentUploadTask?.isRunning == true) {
+            _currentUploadTask?.cancel()
+        }
+
+        _currentUploadTask = PaletteUploadTask(deviceManager, palette)
+        _currentUploadTask?.start(onFinished)
     }
 
     fun setPalette(palette: DefaultPalette, config: PaletteConfig) {
