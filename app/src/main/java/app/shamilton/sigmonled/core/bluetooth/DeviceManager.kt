@@ -11,8 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
-import no.nordicsemi.android.ble.ktx.suspend
-import no.nordicsemi.android.ble.ktx.suspendForResponse
 import no.nordicsemi.android.support.v18.scanner.*
 import no.nordicsemi.android.support.v18.scanner.ScanSettings.*
 import java.util.*
@@ -286,7 +284,12 @@ class DeviceManager(private val activity: ComponentActivity) {
      * If no device is connected, nothing will be written.
      */
     fun write(command: String) {
-        bleManager.write(command)
+        val bytes = command.toByteArray(Charsets.US_ASCII)
+        write(bytes)
+    }
+
+    fun write(bytes: ByteArray) {
+        bleManager.write(bytes)
     }
 
     fun read(onRead: (ByteArray?) -> Unit) {
@@ -385,10 +388,12 @@ class DeviceManager(private val activity: ComponentActivity) {
         /**
          * Writes to the command Characteristic
          */
-        fun write(command: String) {
+        @OptIn(ExperimentalUnsignedTypes::class)
+        fun write(bytes: ByteArray) {
+            println("Writing ${bytes.toUByteArray().joinToString(", ")}")
             super.writeCharacteristic(
                 deviceManager.controlPoint,
-                command.toByteArray(Charsets.US_ASCII),
+                bytes,
                 BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
             )
                 .fail { _, status ->

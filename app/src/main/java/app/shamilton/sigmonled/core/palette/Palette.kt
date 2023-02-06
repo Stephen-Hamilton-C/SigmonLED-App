@@ -1,6 +1,7 @@
 package app.shamilton.sigmonled.core.palette
 
 import app.shamilton.sigmonled.core.color.Color
+import app.shamilton.sigmonled.core.toByteExclude10
 import kotlinx.serialization.Serializable
 
 /**
@@ -103,20 +104,20 @@ data class Palette(
     }
 
     /**
-     * Creates the command to send to the SigmonLED Arduino to upload the palette
+     * Creates the string of bytes to send to the SigmonLED Arduino to upload the palette
      */
-    override fun toString(): String {
-        //format: r00g00b00# (16 times)
-        val builder = StringBuilder()
-        for(color: Color in getFullPalette()) {
-            builder.append("r")
-            builder.append(color.hex.r)
-            builder.append("g")
-            builder.append(color.hex.g)
-            builder.append("b")
-            builder.append(color.hex.b)
-            builder.append("#")
+    fun toByteArray(): ByteArray {
+        val byteList = mutableListOf('C'.code.toByte())
+
+        for(color in getFullPalette()) {
+            val r = color.r.toByteExclude10()
+            val g = color.g.toByteExclude10()
+            val b = color.b.toByteExclude10()
+            byteList.add(r)
+            byteList.add(g)
+            byteList.add(b)
         }
-        return builder.toString()
+
+        return byteList.toByteArray()
     }
 }

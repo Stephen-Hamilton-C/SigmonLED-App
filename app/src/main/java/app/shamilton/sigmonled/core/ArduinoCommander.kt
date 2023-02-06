@@ -3,16 +3,14 @@ package app.shamilton.sigmonled.core
 import androidx.activity.ComponentActivity
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import app.shamilton.sigmonled.core.color.Color
-import app.shamilton.sigmonled.core.color.HEXColor
 import app.shamilton.sigmonled.core.palette.DefaultPalette
 import app.shamilton.sigmonled.core.palette.Palette
-import app.shamilton.sigmonled.core.palette.PaletteConfig
+import app.shamilton.sigmonled.core.palette.PaletteMode
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.subject.publish.PublishSubject
 
 class ArduinoCommander(activity: ComponentActivity) {
-
     val deviceManager = DeviceManager(activity)
     val onAutoConnectStateChanged = PublishSubject<AutoConnectState>()
     private var _autoConnectState = AutoConnectState.FINISHED
@@ -20,50 +18,83 @@ class ArduinoCommander(activity: ComponentActivity) {
             field = value
             onAutoConnectStateChanged.onNext(value)
         }
+    private val terminator: Byte = '\n'.code.toByte()
 
-    fun setPalette(palette: Palette) {
-        val command = "C${palette.toString()}#"
-        deviceManager.write(command)
-    }
-
-    fun setPalette(palette: DefaultPalette, config: PaletteConfig) {
-        val paletteCommand = if(config.solidPalette) { "P" } else { "p" }
-        val blendingCommand = if(config.linearBlending) { "l" } else { "n" }
-        val command = "$paletteCommand${palette.value}$blendingCommand"
-        deviceManager.write(command)
-    }
-
-    fun setColor(color: Color) {
-        setColor(color.hex)
-    }
-
-    fun setColor(hexColor: HEXColor) {
-        val command = "r${hexColor.r}g${hexColor.g}b${hexColor.b}"
-        deviceManager.write(command)
+    fun setBlending(blending: Boolean) {
+        val blendingByte: Byte = if(blending) 1 else 0
+        val bytes = byteArrayOf('l'.code.toByte(), blendingByte, terminator)
+        deviceManager.write(bytes)
     }
 
     fun setBrightness(brightness: Int) {
         if(!(0..255).contains(brightness))
             throw IllegalArgumentException("Brightness must be within the inclusive range 0 - 255")
 
-        val command = "B${brightness.toHexPadded(2)}"
-        deviceManager.write(command)
+        val bytes = byteArrayOf('b'.code.toByte(), brightness.toByte(), terminator)
+        deviceManager.write(bytes)
     }
 
-    fun setStretch(stretch: Int) {
-        if(!(0..15).contains(stretch))
-            throw IllegalArgumentException("Stretch must be within the inclusive range 0 - 15")
+    fun setColor(color: Color) {
+        // Newline is ASCII 10, and due to limitations of SigmonLED, colors can't share this number.
+        // So, we'll just add 1 to the color if it's 10. It'll barely be noticeable
+        val r = color.r.toByteExclude10()
+        val g = color.g.toByteExclude10()
+        val b = color.b.toByteExclude10()
+        val bytes = byteArrayOf('c'.code.toByte(), r, g, b, terminator)
 
-        val command = "s${stretch.toHex()}"
-        deviceManager.write(command)
+        deviceManager.write(bytes)
+    }
+
+    fun setPalette(palette: Palette) {
+        deviceManager.write(palette.toByteArray())
+    }
+
+    fun setPalette(palette: DefaultPalette) {
+        val bytes = byteArrayOf('p'.code.toByte(), palette.value, terminator)
+        deviceManager.write(bytes)
     }
 
     fun setDelay(delay: Int) {
         if(!(0..4095).contains(delay))
             throw IllegalArgumentException("Delay must be within the inclusive range 0 - 4095")
 
-        val command = "d${delay.toHexPadded(3)}"
-        deviceManager.write(command)
+        // Source: https://stackoverflow.com/a/68231424
+        val delayMajorByte = delay.shr(8).toByte()
+        val delayMinorByte = delay.toByte()
+        val bytes = byteArrayOf('d'.code.toByte(), delayMajorByte, delayMinorByte, terminator)
+        deviceManager.write(bytes)
+    }
+
+    fun sleep() {
+        deviceManager.write(byteArrayOf('0'.code.toByte(), terminator))
+    }
+
+    fun wake() {
+        deviceManager.write(byteArrayOf('1'.code.toByte(), terminator))
+    }
+
+    fun setPaletteMode(paletteMode: PaletteMode) {
+        val bytes = byteArrayOf('P'.code.toByte(), paletteMode.value, terminator)
+        deviceManager.write(bytes)
+    }
+
+    fun setStoredColor(color: Color) {
+        val r = color.r.toByteExclude10()
+        val g = color.g.toByteExclude10()
+        val b = color.b.toByteExclude10()
+        val bytes = byteArrayOf('S'.code.toByte(), r, g, b, terminator)
+        deviceManager.write(bytes)
+    }
+
+    fun setStretch(stretch: Int) {
+//        if(!(1..16).contains(stretch))
+//            throw IllegalArgumentException("Stretch must be within the inclusive range 1 - 16")
+        // TODO: Test this range
+        if(!(1..255).contains(stretch))
+            throw IllegalArgumentException("Stretch must be within the inclusive range 1 - 255")
+
+        val bytes = byteArrayOf('s'.code.toByte(), stretch.toByte(), terminator)
+        deviceManager.write(bytes)
     }
 
     fun autoConnect() {
@@ -104,14 +135,6 @@ class ArduinoCommander(activity: ComponentActivity) {
             if(!deviceManager.scanning)
                 deviceManager.scan()
         }
-    }
-
-    fun sleep() {
-        deviceManager.write("S")
-    }
-
-    fun wake() {
-        deviceManager.write("W")
     }
 
 }

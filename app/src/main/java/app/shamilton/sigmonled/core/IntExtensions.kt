@@ -57,3 +57,15 @@ fun Int.toHexPadded(length: Int): String {
     }
     return hex
 }
+
+/**
+ * Converts this Int to a Byte. If the resulting Byte is 10, it returns 11.
+ */
+fun Int.toByteExclude10(): Byte {
+    val byte = this.toByte()
+    return if(byte == 10.toByte()) {
+        11
+    } else {
+        byte
+    }
+}

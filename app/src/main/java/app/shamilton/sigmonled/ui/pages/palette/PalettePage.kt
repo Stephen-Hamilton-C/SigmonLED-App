@@ -13,7 +13,7 @@ import app.shamilton.sigmonled.ui.pages.palette.editor.PaletteEditorTab
 import com.badoo.reaktive.observable.subscribe
 
 private enum class PaletteTab(val displayName: String, val icon: ImageVector, val disableOnDisconnect: Boolean) {
-    CONTROL("Control", Icons.Rounded.Palette, true),
+    CONTROL("Control", Icons.Rounded.Palette, false),
     EDITOR("Editor", Icons.Rounded.Edit, false);
 }
 
