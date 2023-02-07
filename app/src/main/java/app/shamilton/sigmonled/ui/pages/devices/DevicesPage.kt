@@ -3,7 +3,6 @@ package app.shamilton.sigmonled.ui.pages.devices
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,19 +19,6 @@ fun DevicesPage(
 ) {
     val viewModel = deviceManager.getViewModel()
     Column(modifier = modifier) {
-        // Test button
-        var readText by remember { mutableStateOf("Test Read") }
-        Button(
-            onClick = {
-                deviceManager.read() {
-                    readText = "Read result: $it"
-                }
-            },
-            enabled = viewModel.isConnected,
-        ) {
-            Text(readText)
-        }
-
         // List
         if(viewModel.discoveredDevices.isNotEmpty()) {
             for (device in viewModel.discoveredDevices) {

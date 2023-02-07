@@ -292,10 +292,6 @@ class DeviceManager(private val activity: ComponentActivity) {
         bleManager.write(bytes)
     }
 
-    fun read(onRead: (ByteArray?) -> Unit) {
-        bleManager.read(onRead)
-    }
-
     /**
      * Callback methods for scanning
      */
@@ -377,12 +373,6 @@ class DeviceManager(private val activity: ComponentActivity) {
             }
 
             return callback
-        }
-
-        fun read(onRead: (ByteArray?) -> Unit) {
-            super.readCharacteristic(deviceManager.controlPoint).with { _, data ->
-                onRead(data.value)
-            }.enqueue()
         }
 
         /**
