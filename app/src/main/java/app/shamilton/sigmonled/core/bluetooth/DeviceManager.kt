@@ -401,6 +401,7 @@ class DeviceManager(private val activity: ComponentActivity) {
             val devMan: DeviceManager
                 get() = deviceManager!!
 
+            @Deprecated("TODO")
             override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
                 // Here get instances of your characteristics.
                 // Return false if a required service has not been discovered.
@@ -414,6 +415,7 @@ class DeviceManager(private val activity: ComponentActivity) {
                 return devMan.controlPoint != null
             }
 
+            @Deprecated("TODO")
             override fun initialize() {
                 // Initialize your device.
                 // This means e.g. enabling notifications, setting notification callbacks,
@@ -424,6 +426,7 @@ class DeviceManager(private val activity: ComponentActivity) {
                 devMan.write("x")
             }
 
+            @Deprecated("TODO")
             override fun onServicesInvalidated() {
                 // This method is called when the services get invalidated, i.e. when the device
                 // disconnects.
