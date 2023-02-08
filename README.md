@@ -1,2 +1,2 @@
-# sigmonled-app
-Cross-platform app to control a SigmonLED-Arduino, written in Kotlin using Compose Multiplatform
+# SigmonLED-App
+Android app to control a SigmonLED-Arduino, written in Kotlin using Jetpack Compose
