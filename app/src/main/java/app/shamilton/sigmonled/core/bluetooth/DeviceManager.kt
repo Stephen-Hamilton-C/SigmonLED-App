@@ -395,13 +395,14 @@ class DeviceManager(private val activity: ComponentActivity) {
                 .enqueue()
         }
 
+        @Deprecated("Implement all methods directly in your manager")
         private class DeviceManagerGattCallback(var deviceManager: DeviceManager?) : BleManagerGattCallback() {
 
             // I really don't wanna type !! all the time
             val devMan: DeviceManager
                 get() = deviceManager!!
 
-            @Deprecated("TODO")
+            @Deprecated("Implement all methods directly in your manager")
             override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
                 // Here get instances of your characteristics.
                 // Return false if a required service has not been discovered.
@@ -415,7 +416,7 @@ class DeviceManager(private val activity: ComponentActivity) {
                 return devMan.controlPoint != null
             }
 
-            @Deprecated("TODO")
+            @Deprecated("Implement all methods directly in your manager")
             override fun initialize() {
                 // Initialize your device.
                 // This means e.g. enabling notifications, setting notification callbacks,
@@ -426,7 +427,7 @@ class DeviceManager(private val activity: ComponentActivity) {
                 devMan.write("x")
             }
 
-            @Deprecated("TODO")
+            @Deprecated("Implement all methods directly in your manager")
             override fun onServicesInvalidated() {
                 // This method is called when the services get invalidated, i.e. when the device
                 // disconnects.
