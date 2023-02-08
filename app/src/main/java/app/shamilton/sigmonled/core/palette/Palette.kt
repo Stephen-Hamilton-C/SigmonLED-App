@@ -107,7 +107,7 @@ data class Palette(
      * Creates the string of bytes to send to the SigmonLED Arduino to upload the palette
      */
     fun toByteArray(): ByteArray {
-        val byteList = mutableListOf('C'.code.toByte())
+        val byteList = mutableListOf<Byte>()
 
         for(color in getFullPalette()) {
             val r = color.r.toByteExclude10()

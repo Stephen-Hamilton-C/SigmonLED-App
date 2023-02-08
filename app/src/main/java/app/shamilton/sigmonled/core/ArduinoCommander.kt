@@ -5,20 +5,32 @@ import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import app.shamilton.sigmonled.core.color.Color
 import app.shamilton.sigmonled.core.palette.DefaultPalette
 import app.shamilton.sigmonled.core.palette.Palette
-import app.shamilton.sigmonled.core.palette.PaletteMode
 import com.badoo.reaktive.observable.subscribe
+import app.shamilton.sigmonled.core.palette.PaletteMode
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.subject.publish.PublishSubject
 
 class ArduinoCommander(activity: ComponentActivity) {
     val deviceManager = DeviceManager(activity)
     val onAutoConnectStateChanged = PublishSubject<AutoConnectState>()
+    val isUploadingPalette: Boolean
+        get() = _currentUploadTask?.isRunning ?: false
     private var _autoConnectState = AutoConnectState.FINISHED
         set(value) {
             field = value
             onAutoConnectStateChanged.onNext(value)
         }
     private val terminator: Byte = '\n'.code.toByte()
+    private var _currentUploadTask: PaletteUploadTask? = null
+
+    fun setPalette(palette: Palette, onFinished: () -> Unit = {}) {
+        if(_currentUploadTask?.isRunning == true) {
+            _currentUploadTask?.cancel()
+        }
+
+        _currentUploadTask = PaletteUploadTask(deviceManager, palette)
+        _currentUploadTask?.start(onFinished)
+    }
 
     fun setBlending(blending: Boolean) {
         val blendingByte: Byte = if(blending) 1 else 0
@@ -43,10 +55,6 @@ class ArduinoCommander(activity: ComponentActivity) {
         val bytes = byteArrayOf('c'.code.toByte(), r, g, b, terminator)
 
         deviceManager.write(bytes)
-    }
-
-    fun setPalette(palette: Palette) {
-        deviceManager.write(palette.toByteArray())
     }
 
     fun setPalette(palette: DefaultPalette) {

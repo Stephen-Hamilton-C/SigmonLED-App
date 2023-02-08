@@ -71,9 +71,12 @@ fun CustomPaletteItem(
         Text(palette.name)
 
         // Upload button
+
+        // TODO: Maybe the viewmodel should be an the commander...
+        // Then I can use isUploadingPalette correctly
         IconButton(
             onClick = { commander.setPalette(palette) },
-            enabled = commander.deviceManager.getViewModel().isConnected
+            enabled = commander.deviceManager.getViewModel().isConnected && !commander.isUploadingPalette
         ) {
             Icon(Icons.Rounded.Upload, "Upload")
         }
