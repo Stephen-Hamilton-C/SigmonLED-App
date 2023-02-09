@@ -4,6 +4,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.vector.ImageVector
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.AutoConnectState
 import com.badoo.reaktive.observable.subscribe
@@ -17,10 +20,32 @@ fun AppTopBar(
 ) {
     val deviceManager = commander.deviceManager
     val viewModel = deviceManager.getViewModel()
+    var scanningToConnect by rememberSaveable { mutableStateOf(false) }
+
     val connectedIcon = Icons.Rounded.BluetoothConnected
     val disconnectedIcon = Icons.Rounded.Bluetooth
-    var connectIcon by remember { mutableStateOf(disconnectedIcon) }
-    var scanningToConnect by remember { mutableStateOf(false) }
+    val searchingIcon = Icons.Rounded.BluetoothSearching
+    val iconSaver = Saver<ImageVector, Int>(
+        save = {
+            when(it) {
+                connectedIcon -> 0
+                disconnectedIcon -> 1
+                searchingIcon -> 2
+                else ->
+                    throw IllegalArgumentException("Attempted to save an icon that has no index!")
+            }
+        },
+        restore = {
+            when(it) {
+                0 -> connectedIcon
+                1 -> disconnectedIcon
+                2 -> searchingIcon
+                else ->
+                    throw IllegalArgumentException("Attempted to load an icon that has no index!")
+            }
+        }
+    )
+    var connectIcon by rememberSaveable(stateSaver = iconSaver) { mutableStateOf(disconnectedIcon) }
 
     deviceManager.onDeviceConnected.subscribe {
         connectIcon = connectedIcon
@@ -39,7 +64,7 @@ fun AppTopBar(
                 when(state) {
                     AutoConnectState.SCANNING -> {
                         scanningToConnect = true
-                        connectIcon = Icons.Rounded.BluetoothSearching
+                        connectIcon = searchingIcon
                     }
                     AutoConnectState.CONNECTING -> {
                         scanningToConnect = false
@@ -72,7 +97,7 @@ fun AppTopBar(
             }
         },
         title = {
-            var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+            var currentPage by rememberSaveable { mutableStateOf(AppScaffold.currentPage) }
             AppScaffold.onPageNavigation.subscribe { currentPage = it }
             Text(currentPage.displayName)
         },
@@ -95,7 +120,7 @@ fun AppTopBar(
             }
 
             // Scan button
-            var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+            var currentPage by rememberSaveable { mutableStateOf(AppScaffold.currentPage) }
             AppScaffold.onPageNavigation.subscribe { currentPage = it }
             if(currentPage == Pages.DEVICES) {
                 IconButton(

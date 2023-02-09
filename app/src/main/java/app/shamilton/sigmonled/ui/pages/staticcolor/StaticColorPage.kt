@@ -3,6 +3,7 @@ package app.shamilton.sigmonled.ui.pages.staticcolor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.ArduinoCommander
@@ -14,8 +15,8 @@ var colorChanged = false
 
 @Composable
 fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
-    var currentColor by remember { mutableStateOf(Color(255, 255, 255)) }
-    var timerCreated by remember { mutableStateOf(false) }
+    var currentColor by rememberSaveable(stateSaver = Color.Saver) { mutableStateOf(Color(255, 255, 255)) }
+    var timerCreated by rememberSaveable { mutableStateOf(false) }
 
     if(!timerCreated) {
         timerCreated = true

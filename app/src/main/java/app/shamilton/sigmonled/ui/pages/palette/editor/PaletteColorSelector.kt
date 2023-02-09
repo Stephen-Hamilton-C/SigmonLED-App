@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.color.Color
@@ -12,7 +13,7 @@ import app.shamilton.sigmonled.ui.picker.ColorPicker
 
 @Composable
 fun PaletteColorSelector(defaultColor: Color = Color.BLACK, onSave: (Color) -> Unit, onExit: () -> Unit) {
-    var currentColor: Color by remember { mutableStateOf(defaultColor) }
+    var currentColor: Color by rememberSaveable(stateSaver = Color.Saver) { mutableStateOf(defaultColor) }
     ColorPicker(
         modifier = Modifier
             .fillMaxHeight(0.75f)

@@ -1,5 +1,6 @@
 package app.shamilton.sigmonled.core.color
 
+import androidx.compose.runtime.saveable.Saver
 import com.godaddy.android.colorpicker.HsvColor
 import kotlinx.serialization.Serializable
 
@@ -199,6 +200,11 @@ class Color() {
             this(color.red.toInt(), color.green.toInt(), color.blue.toInt())
 
     companion object {
+        val Saver = Saver<Color, List<Double>> (
+            save = { listOf(it.h, it.s, it.v) },
+            restore = { Color(it[0], it[1], it[2]) },
+        )
+
         val BLACK = Color(0, 0, 0)
         val BLUE = Color(0, 0, 255)
         val CYAN = Color(0, 255, 255)

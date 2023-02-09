@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 
@@ -28,7 +28,7 @@ fun NumberInput(
     incrementDelta: Int,
     range: ClosedRange<Int> = Int.MIN_VALUE..Int.MAX_VALUE,
 ) {
-    var number by remember { mutableStateOf(value) }
+    var number by rememberSaveable { mutableStateOf(value) }
     fun setNumber(newValue: Int) {
         number = newValue.coerceIn(range)
         onValueChanged(number)

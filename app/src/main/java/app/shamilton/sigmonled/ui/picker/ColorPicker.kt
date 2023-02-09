@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,7 +18,7 @@ import com.godaddy.android.colorpicker.harmony.HarmonyColorPicker
 @Composable
 fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onColorChanged: (Color) -> Unit) {
     val viewModel = viewModel<ColorPresetsModel>().load(LocalContext.current)
-    var hexInput by remember { mutableStateOf(color.hex.toString()) }
+    var hexInput by rememberSaveable { mutableStateOf(color.hex.toString()) }
 
     fun setColor(color: Color) {
         hexInput = color.hex.toString()
@@ -38,7 +39,7 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
 
     // Saved colors
     val currentContext = LocalContext.current
-    var editingColors by remember { mutableStateOf(false) }
+    var editingColors by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = Modifier.horizontalScroll(rememberScrollState())
     ) {
@@ -83,7 +84,7 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
         }
     }
 
-    var hexInputError by remember { mutableStateOf(false) }
+    var hexInputError by rememberSaveable { mutableStateOf(false) }
     TextField(
         label = { Text("HEX Code") },
         value = hexInput,

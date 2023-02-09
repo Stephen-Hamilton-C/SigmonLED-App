@@ -3,6 +3,7 @@ package app.shamilton.sigmonled.ui.scaffold
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,7 +45,7 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
         )
         Divider(modifier = Modifier.padding(vertical = 12.dp))
 
-        var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+        var currentPage by rememberSaveable { mutableStateOf(AppScaffold.currentPage) }
         AppScaffold.onPageNavigation.subscribe { currentPage = it }
         for(page in Pages.values()) {
             TextButton(

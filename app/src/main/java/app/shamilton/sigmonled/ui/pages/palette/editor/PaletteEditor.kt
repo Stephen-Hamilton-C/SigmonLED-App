@@ -4,6 +4,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -12,8 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 @Composable
 fun PaletteEditor(viewModel: PaletteEditorModel) {
     viewModel.selectedPalette?.let { selectedPalette ->
-        var currentColorIndex: Int by remember { mutableStateOf(-1) }
-        var name: String by remember { mutableStateOf(selectedPalette.name) }
+        var currentColorIndex: Int by rememberSaveable { mutableStateOf(-1) }
+        var name: String by rememberSaveable { mutableStateOf(selectedPalette.name) }
         if(currentColorIndex < 0) {
             // No color currently selected, show the list of colors
             TextField(value = name, onValueChange = { name = it })
