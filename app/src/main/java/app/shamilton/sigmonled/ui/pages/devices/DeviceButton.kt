@@ -1,29 +1,66 @@
 package app.shamilton.sigmonled.ui.pages.devices
 
 import android.bluetooth.BluetoothDevice
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
+import androidx.compose.foundation.clickable
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
-import com.badoo.reaktive.observable.subscribe
 
-private fun getColor(device: BluetoothDevice, deviceManager: DeviceManager): Color {
-    return if(deviceManager.connectedDevice == device)
-        Color.Blue
-    else
-        Color.White
-}
+//private fun getColor(device: BluetoothDevice, deviceManager: DeviceManager): Color {
+//    return if(deviceManager.connectedDevice == device)
+//        Color.Blue
+//    else
+//        Color.White
+//}
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeviceButton(
     device: BluetoothDevice,
     deviceManager: DeviceManager,
 ) {
     val viewModel = deviceManager.getViewModel()
+    var clicked by rememberSaveable { mutableStateOf(false) }
+    ListItem(
+        text = { Text(
+            try {
+                device.name
+            } catch (se: SecurityException) {
+                device.address
+            }
+        ) },
+        secondaryText = {
+            if(viewModel.connectedDevice == device) {
+                Text("Connected")
+                clicked = false
+            } else if(viewModel.isConnecting && clicked) {
+                Text("Connecting...")
+            } else if(viewModel.isDisconnecting && clicked) {
+                Text("Disconnecting...")
+            } else {
+                clicked = false
+            }
+        },
+        modifier = Modifier.clickable(
+            enabled = !viewModel.isConnecting || !viewModel.isDisconnecting
+        ) {
+            clicked = true
+            if(deviceManager.connectedDevice === device) {
+                deviceManager.disconnect()
+            } else {
+                if(deviceManager.isConnected) {
+                    deviceManager.disconnect()
+                }
+                deviceManager.connect(device)
+            }
+        }
+    )
 
+    /*
     // Text color
     // TODO: Get color by viewModel... not sure how exactly
     var displayNameColor by remember { mutableStateOf(getColor(device, deviceManager)) }
@@ -64,4 +101,5 @@ fun DeviceButton(
     ) {
         Text(displayName, color = displayNameColor)
     }
+    */
 }
