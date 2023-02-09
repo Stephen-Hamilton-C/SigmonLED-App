@@ -21,11 +21,12 @@ import androidx.compose.ui.text.input.KeyboardType
 // TODO: Need better name for incrementDelta
 @Composable
 fun NumberInput(
+    modifier: Modifier = Modifier,
     label: String,
     value: Int,
     onValueChanged: (Int) -> Unit,
     incrementDelta: Int,
-    range: ClosedRange<Int> = Int.MIN_VALUE..Int.MAX_VALUE
+    range: ClosedRange<Int> = Int.MIN_VALUE..Int.MAX_VALUE,
 ) {
     var number by remember { mutableStateOf(value) }
     fun setNumber(newValue: Int) {
@@ -33,7 +34,9 @@ fun NumberInput(
         onValueChanged(number)
     }
 
-    Row() {
+    Row(
+        modifier = modifier
+    ) {
         Button(
             modifier = Modifier.fillMaxWidth(0.2f),
             onClick = { setNumber(number - incrementDelta) },

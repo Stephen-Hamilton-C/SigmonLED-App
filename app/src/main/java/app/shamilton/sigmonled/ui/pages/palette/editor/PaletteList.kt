@@ -1,20 +1,17 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Upload
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.palette.Palette
 
@@ -23,11 +20,15 @@ import app.shamilton.sigmonled.core.palette.Palette
  */
 @Composable
 fun PaletteList(viewModel: PaletteEditorModel, commander: ArduinoCommander) {
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(12.dp),
+    ) {
         // Create list
         val currentContext = LocalContext.current
         viewModel.savedPalettes.forEachIndexed { i, palette ->
-            CustomPaletteItem(
+            PaletteListItem(
                 palette = palette,
                 index = i,
                 viewModel = viewModel,
@@ -58,40 +59,58 @@ fun PaletteList(viewModel: PaletteEditorModel, commander: ArduinoCommander) {
  * @param commander The ArduinoCommander for this context
  * @param onDelete The method to invoke when the delete button is tapped
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CustomPaletteItem(
+fun PaletteListItem(
     palette: Palette,
     index: Int,
     viewModel: PaletteEditorModel,
     commander: ArduinoCommander,
     onDelete: () -> Unit = {},
 ) {
-    Row() {
-        // Label
-        Text(palette.name)
 
-        // Upload button
-
-        // TODO: Maybe the viewmodel should be an the commander...
-        // Then I can use isUploadingPalette correctly
-        IconButton(
-            onClick = { commander.setPalette(palette) },
-            enabled = commander.deviceManager.getViewModel().isConnected && !commander.isUploadingPalette
-        ) {
-            Icon(Icons.Rounded.Upload, "Upload")
-        }
-
-        // Edit button
-        IconButton(onClick = {
-            viewModel.selectedPalette = palette
-            viewModel.selectedPaletteIndex = index
-        }) {
-            Icon(Icons.Rounded.Edit, "Edit")
-        }
-
-        // Delete button
-        IconButton(onClick = onDelete) {
-            Icon(Icons.Rounded.Delete, "Delete")
-        }
+    fun uploadClicked() {
+        commander.setPalette(palette)
     }
+
+    fun editClicked() {
+        viewModel.selectedPalette = palette
+        viewModel.selectedPaletteIndex = index
+    }
+
+    var expanded by remember { mutableStateOf(false) }
+    ListItem(
+        text = {
+            Text(palette.name)
+        },
+        trailing = {
+            IconButton(onClick = { expanded = true }) {
+                Icon(Icons.Rounded.MoreVert, "Menu")
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                // TODO: Maybe the viewmodel should be an the commander...
+                // Then I can use isUploadingPalette correctly
+                DropdownMenuItem(
+                    onClick = { uploadClicked() },
+                    enabled = commander.deviceManager.getViewModel().isConnected
+                            && !commander.isUploadingPalette,
+                ) {
+                    Text("Upload")
+                }
+                DropdownMenuItem(onClick = { editClicked() }) {
+                    Text("Edit")
+                }
+                DropdownMenuItem(onClick = { onDelete() }) {
+                    Text("Delete")
+                }
+            }
+        },
+        modifier = Modifier.clickable {
+            expanded = true
+        }
+    )
+    Divider()
 }

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import app.shamilton.sigmonled.core.ArduinoCommander
@@ -21,7 +22,7 @@ private enum class PaletteTab(val displayName: String, val icon: ImageVector, va
 @Composable
 fun PalettePage(modifier: Modifier, commander: ArduinoCommander) {
     val devManViewModel = commander.deviceManager.getViewModel()
-    var selectedTabIndex by remember { mutableStateOf(
+    var selectedTabIndex by rememberSaveable  { mutableStateOf(
         if(devManViewModel.isConnected)
             PaletteTab.CONTROL.ordinal // Default to CONTROL tab when connected
         else
