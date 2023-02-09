@@ -41,7 +41,7 @@ fun AboutPage(modifier: Modifier) {
                 .height(120.dp),
         )
         Text("About SigmonLED", style = MaterialTheme.typography.h5)
-        Divider(modifier = Modifier.padding(top = 6.dp, bottom = 12.dp))
+        Divider(modifier = Modifier.padding(top = 12.dp))
 
         // Version
         ListItem(
