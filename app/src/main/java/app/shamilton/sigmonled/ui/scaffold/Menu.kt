@@ -33,6 +33,10 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
                 } catch (se: SecurityException) {
                     "Connected to ${deviceManager.connectedDevice?.address}"
                 }
+            } else if(viewModel.isConnecting) {
+                "Connecting..."
+            } else if(viewModel.isDisconnecting) {
+                "Disconnecting..."
             } else {
                 "Disconnected"
             },
