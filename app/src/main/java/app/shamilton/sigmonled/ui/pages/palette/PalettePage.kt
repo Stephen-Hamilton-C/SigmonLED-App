@@ -2,21 +2,13 @@ package app.shamilton.sigmonled.ui.pages.palette
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.pages.palette.editor.PaletteEditorTab
 import com.badoo.reaktive.observable.subscribe
 
-private enum class PaletteTab(val displayName: String, val icon: ImageVector, val disableOnDisconnect: Boolean) {
-    CONTROL("Control", Icons.Rounded.Palette, false),
-    EDITOR("Editor", Icons.Rounded.Edit, false);
-}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
