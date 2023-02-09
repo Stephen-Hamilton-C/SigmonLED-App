@@ -12,17 +12,7 @@ import kotlinx.serialization.json.Json
 
 class ColorPresetsModel : ViewModel() {
     var savedColors: MutableList<Color> = mutableStateListOf()
-    val defaultColors = mutableListOf(
-        Color(40.0 / 360, 200.0 / 255, 1.0),
-        Color.WHITE,
-        Color.RED,
-        Color.ORANGE,
-        Color.YELLOW,
-        Color.GREEN,
-        Color.BLUE,
-        Color(127, 0, 255),
-        Color.MAGENTA,
-    )
+
 
     fun save(context: Context) {
         val colorsData = Json.encodeToString(savedColors)

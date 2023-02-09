@@ -1,11 +1,7 @@
 package app.shamilton.sigmonled.ui.picker
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -26,43 +22,29 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
     }
 
     // Default colors
-    Row(
-        modifier = Modifier.horizontalScroll(rememberScrollState())
-    ) {
-        viewModel.defaultColors.forEach { color ->
-            Button(
-                onClick = { setColor(color) },
-                colors = ButtonDefaults.buttonColors(backgroundColor = color.toAndroidColor()),
-            ) {}
-        }
-    }
+    DefaultColors(
+        onColorSelect = { setColor(it) },
+    )
 
     // Saved colors
     val currentContext = LocalContext.current
     var editingColors by rememberSaveable { mutableStateOf(false) }
-    Row(
-        modifier = Modifier.horizontalScroll(rememberScrollState())
-    ) {
-        viewModel.savedColors.forEach { color ->
-            Button(
-                onClick = {
-                    if(editingColors) {
-                        viewModel.savedColors.remove(color)
-                        viewModel.save(currentContext)
+    SavedColors(
+        onColorSelect = {
+            if(editingColors) {
+                viewModel.savedColors.remove(it)
+                viewModel.save(currentContext)
 
-                        if(viewModel.savedColors.isEmpty())
-                            editingColors = false
-                    } else {
-                        setColor(color)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = color.toAndroidColor()),
-            ) {
-                if(editingColors)
-                    Icon(Icons.Rounded.DeleteForever, "Delete")
+                if(viewModel.savedColors.isEmpty())
+                    editingColors = false
+            } else {
+                setColor(it)
             }
-        }
-    }
+        },
+        viewModel = viewModel,
+        isEditing = editingColors,
+    )
+
     Row() {
         Button(
             onClick = {
@@ -70,7 +52,7 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
                 viewModel.save(currentContext)
             },
             enabled = !viewModel.savedColors.contains(color)
-                    && !viewModel.defaultColors.contains(color),
+                    && !defaultColors.contains(color),
         ) {
             Text("Add Current Color")
         }

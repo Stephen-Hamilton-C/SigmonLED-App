@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.palette.Palette
+import app.shamilton.sigmonled.ui.picker.ColorButton
 
 @Composable
 fun PaletteColorList(
@@ -25,10 +25,11 @@ fun PaletteColorList(
     ) {
         items(palette.colors.size) { i ->
             val color = palette.colors[i]
-            Button(onClick = {
-                onColorIndexSelected(i)
-            },
-                colors = ButtonDefaults.buttonColors(backgroundColor = color.toAndroidColor()),
+            ColorButton(
+                onClick = {
+                    onColorIndexSelected(i)
+                },
+                color = color,
             ) {}
         }
     }
