@@ -1,8 +1,6 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Button
@@ -22,10 +20,16 @@ fun PaletteColorList(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         items(palette.colors.size) { i ->
             val color = palette.colors[i]
             ColorButton(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .padding(6.dp)
+                    .height(24.dp),
                 onClick = {
                     onColorIndexSelected(i)
                 },

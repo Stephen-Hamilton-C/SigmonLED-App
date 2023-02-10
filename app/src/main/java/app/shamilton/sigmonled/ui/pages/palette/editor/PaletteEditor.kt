@@ -1,11 +1,16 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 
 /**
  * UI for editing a selected custom palette
@@ -17,7 +22,14 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
         var name: String by rememberSaveable { mutableStateOf(selectedPalette.name) }
         if(currentColorIndex < 0) {
             // No color currently selected, show the list of colors
-            TextField(value = name, onValueChange = { name = it })
+
+            // Name
+            TextField(
+                value = name,
+                onValueChange = { name = it },
+            )
+
+            // Color list
             PaletteColorList(
                 palette = selectedPalette,
                 onColorIndexSelected = { currentColorIndex = it },
@@ -29,33 +41,46 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
                 }
             )
 
-            // Save palette button
-            val currentContext = LocalContext.current
-            Button(onClick = {
-                // Change name first if it has been changed
-                if(selectedPalette.name != name)
-                    viewModel.selectedPalette = selectedPalette.changeName(name)
+            // Save/Exit buttons
+            Row() {
+                // Save palette button
+                val currentContext = LocalContext.current
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(6.dp),
+                    onClick = {
+                        // Change name first if it has been changed
+                        if (selectedPalette.name != name)
+                            viewModel.selectedPalette = selectedPalette.changeName(name)
 
-                viewModel.selectedPalette?.let {
-                    if (viewModel.selectedPaletteIndex in 0..viewModel.savedPalettes.size) {
-                        // Save existing palette
-                        viewModel.savedPalettes[viewModel.selectedPaletteIndex] = it
-                    } else {
-                        // Save new palette
-                        viewModel.savedPalettes.add(it)
-                    }
+                        viewModel.selectedPalette?.let {
+                            if (viewModel.selectedPaletteIndex in 0..viewModel.savedPalettes.size) {
+                                // Save existing palette
+                                viewModel.savedPalettes[viewModel.selectedPaletteIndex] = it
+                            } else {
+                                // Save new palette
+                                viewModel.savedPalettes.add(it)
+                            }
+                        }
+
+                        // Go back to palette list and write changes
+                        viewModel.selectedPalette = null
+                        viewModel.save(currentContext)
+                    },
+                ) {
+                    Text("Save")
                 }
 
-                // Go back to palette list and write changes
-                viewModel.selectedPalette = null
-                viewModel.save(currentContext)
-            }) {
-                Text("Save")
-            }
-
-            // Exit and discard changes button
-            Button(onClick = { viewModel.selectedPalette = null }) {
-                Text("Exit")
+                // Exit and discard changes button
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .padding(6.dp),
+                    onClick = { viewModel.selectedPalette = null },
+                ) {
+                    Text("Exit")
+                }
             }
         } else {
             // A color is currently selected
@@ -72,4 +97,3 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
         }
     }
 }
-
