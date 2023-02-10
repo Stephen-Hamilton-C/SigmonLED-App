@@ -3,10 +3,7 @@ package app.shamilton.sigmonled.ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Remove
@@ -37,7 +34,7 @@ fun NumberInput(
     Row(
         modifier = modifier
     ) {
-        Button(
+        FloatingActionButton(
             modifier = Modifier.fillMaxWidth(0.2f),
             onClick = { setNumber(number - incrementDelta) },
         ) {
@@ -54,7 +51,7 @@ fun NumberInput(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
-        Button(
+        FloatingActionButton(
             modifier = Modifier.fillMaxWidth(1f),
             onClick = { setNumber(number + incrementDelta) },
         ) {
