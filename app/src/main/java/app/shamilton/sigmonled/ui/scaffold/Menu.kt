@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import com.badoo.reaktive.observable.subscribe
 import kotlinx.coroutines.launch
 
@@ -22,7 +24,9 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth().padding(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
     ) {
         Text(
             text = "SigmonLED",
@@ -65,7 +69,9 @@ fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
                 } else {
                    ButtonDefaults.textButtonColors()
                 },
-                modifier = Modifier.align(Alignment.Start).fillMaxWidth(),
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .fillMaxWidth(),
                 enabled = !page.disableOnDisconnect || viewModel.isConnected
             ) {
                 Icon(page.icon, page.displayName)
