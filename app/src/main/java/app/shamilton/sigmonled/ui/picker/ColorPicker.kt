@@ -98,5 +98,4 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
             setColor(Color(hsvColor))
         }
     )
-    // TODO: Make an output display
 }
