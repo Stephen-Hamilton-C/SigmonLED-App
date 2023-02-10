@@ -1,7 +1,9 @@
 package app.shamilton.sigmonled.ui.pages.palette
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -20,7 +22,9 @@ import kotlin.math.roundToInt
 @Composable
 fun PaletteControlTab(commander: ArduinoCommander) {
     Column(
-        modifier = Modifier.padding(6.dp),
+        modifier = Modifier
+            .padding(6.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         var selectedPalette by rememberSaveable { mutableStateOf(DefaultPalette.RAINBOW) }
