@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Menu(navController: NavHostController, deviceManager: DeviceManager) {
-    val viewModel = deviceManager.getViewModel()
+    val viewModel: DeviceManagerViewModel =
+        viewModel(factory = DeviceManagerViewModel.Factory(deviceManager))
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceEvenly,

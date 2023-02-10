@@ -1,7 +1,6 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.ArduinoCommander
 
@@ -11,7 +10,7 @@ import app.shamilton.sigmonled.core.ArduinoCommander
  */
 @Composable
 fun PaletteEditorTab(commander: ArduinoCommander) {
-    val viewModel = viewModel<PaletteEditorModel>().load(LocalContext.current)
+    val viewModel: PaletteEditorModel = viewModel()
 
     if(viewModel.selectedPalette == null) {
         PaletteList(viewModel, commander)

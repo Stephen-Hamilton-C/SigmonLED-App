@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 
 
 @Composable
@@ -18,7 +20,8 @@ fun DevicesPage(
     modifier: Modifier,
     deviceManager: DeviceManager,
 ) {
-    val viewModel = deviceManager.getViewModel()
+    val viewModel: DeviceManagerViewModel =
+        viewModel(factory = DeviceManagerViewModel.Factory(deviceManager))
     Column(modifier = modifier) {
         // List
         if(viewModel.discoveredDevices.isNotEmpty()) {

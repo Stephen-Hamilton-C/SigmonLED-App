@@ -7,8 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.AutoConnectState
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import com.badoo.reaktive.observable.subscribe
 import kotlinx.coroutines.launch
 import app.shamilton.sigmonled.ui.pages.Pages
@@ -19,7 +21,8 @@ fun AppTopBar(
     commander: ArduinoCommander,
 ) {
     val deviceManager = commander.deviceManager
-    val viewModel = deviceManager.getViewModel()
+    val viewModel: DeviceManagerViewModel =
+        viewModel(factory = DeviceManagerViewModel.Factory(deviceManager))
     var scanningToConnect by rememberSaveable { mutableStateOf(false) }
 
     val connectedIcon = Icons.Rounded.BluetoothConnected

@@ -7,7 +7,6 @@ import android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED
 import android.content.Context
 import android.os.ParcelUuid
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
@@ -19,7 +18,7 @@ import kotlin.concurrent.schedule
 /**
  * Handles all low-level Bluetooth Low Energy connections
  */
-class DeviceManager(private val activity: ComponentActivity) {
+class DeviceManager(activity: ComponentActivity) {
 
     // Subjects
     /**
@@ -115,7 +114,6 @@ class DeviceManager(private val activity: ComponentActivity) {
     private val _discoveredDevices = mutableSetOf<BluetoothDevice>()
     private val bleManager = InternalManager(this, activity)
     private var scanningTask: TimerTask? = null
-    private val factory = DeviceManagerViewModel.Factory(this)
 
     // UUIDs
     private val serviceUUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb")
@@ -152,8 +150,6 @@ class DeviceManager(private val activity: ComponentActivity) {
             }
         }
     }
-
-    fun getViewModel() = ViewModelProvider(activity, factory)[DeviceManagerViewModel::class.java]
 
     /**
      * Starts a scan for nearby BLE devices.

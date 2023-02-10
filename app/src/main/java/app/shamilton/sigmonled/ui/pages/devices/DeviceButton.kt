@@ -8,7 +8,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -16,7 +18,8 @@ fun DeviceButton(
     device: BluetoothDevice,
     deviceManager: DeviceManager,
 ) {
-    val viewModel = deviceManager.getViewModel()
+    val viewModel: DeviceManagerViewModel =
+        viewModel(factory = DeviceManagerViewModel.Factory(deviceManager))
     var clicked by rememberSaveable { mutableStateOf(false) }
 
     @Composable

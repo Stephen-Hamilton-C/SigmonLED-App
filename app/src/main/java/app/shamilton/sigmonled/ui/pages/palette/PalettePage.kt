@@ -5,7 +5,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import app.shamilton.sigmonled.ui.pages.palette.editor.PaletteEditorTab
 import com.badoo.reaktive.observable.subscribe
 
@@ -13,7 +15,8 @@ import com.badoo.reaktive.observable.subscribe
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PalettePage(modifier: Modifier, commander: ArduinoCommander) {
-    val devManViewModel = commander.deviceManager.getViewModel()
+    val devManViewModel: DeviceManagerViewModel =
+        viewModel(factory = DeviceManagerViewModel.Factory(commander.deviceManager))
     var selectedTabIndex by rememberSaveable  { mutableStateOf(
         if(devManViewModel.isConnected)
             PaletteTab.CONTROL.ordinal // Default to CONTROL tab when connected
