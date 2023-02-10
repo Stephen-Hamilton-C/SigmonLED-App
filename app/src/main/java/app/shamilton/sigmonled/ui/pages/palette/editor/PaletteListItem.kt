@@ -52,16 +52,25 @@ fun PaletteListItem(
                 // TODO: Maybe the viewmodel should be an the commander...
                 // Then I can use isUploadingPalette correctly
                 DropdownMenuItem(
-                    onClick = { uploadClicked() },
+                    onClick = {
+                        expanded = false
+                        uploadClicked()
+                    },
                     enabled = commander.deviceManager.getViewModel().isConnected
                             && !commander.isUploadingPalette,
                 ) {
                     Text("Upload")
                 }
-                DropdownMenuItem(onClick = { editClicked() }) {
+                DropdownMenuItem(onClick = {
+                    expanded = false
+                    editClicked()
+                }) {
                     Text("Edit")
                 }
-                DropdownMenuItem(onClick = { onDelete() }) {
+                DropdownMenuItem(onClick = {
+                    expanded = false
+                    onDelete()
+                }) {
                     Text("Delete")
                 }
             }
