@@ -1,10 +1,14 @@
 package app.shamilton.sigmonled.ui.picker
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import app.shamilton.sigmonled.core.color.Color
 
 val defaultColors = mutableListOf(
@@ -24,14 +28,21 @@ fun DefaultColors(
     modifier: Modifier = Modifier,
     onColorSelect: (Color) -> Unit,
 ) {
-    Row(
-        modifier = modifier.horizontalScroll(rememberScrollState())
+    Column(
+        modifier = modifier
     ) {
-        defaultColors.forEach {
-            ColorButton(
-                onClick = { onColorSelect(it) },
-                color = it,
-            )
+        Text("Default colors:")
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(top = 6.dp)
+        ) {
+            defaultColors.forEach {
+                ColorButton(
+                    onClick = { onColorSelect(it) },
+                    color = it,
+                )
+            }
         }
     }
 }

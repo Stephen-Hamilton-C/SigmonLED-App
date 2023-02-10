@@ -1,11 +1,13 @@
 package app.shamilton.sigmonled.ui.picker
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.color.Color
 import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
@@ -43,6 +45,8 @@ fun ColorPicker(modifier: Modifier = Modifier, color: Color = Color.BLACK, onCol
         },
         viewModel = viewModel,
         isEditing = editingColors,
+        modifier = Modifier
+            .padding(vertical = 12.dp)
     )
 
     Row() {

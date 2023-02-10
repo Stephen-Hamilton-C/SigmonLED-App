@@ -28,8 +28,9 @@ fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
         }
     }
 
-    Column(modifier = modifier
-        .padding(24.dp)
+    Column(
+        modifier = modifier
+            .padding(12.dp)
     ) {
         // Color picker
         ColorPicker(
