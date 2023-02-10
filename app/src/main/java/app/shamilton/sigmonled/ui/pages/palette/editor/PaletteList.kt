@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -39,10 +40,15 @@ fun PaletteList(viewModel: PaletteEditorModel, commander: ArduinoCommander) {
         }
 
         // Create palette button
-        Button(onClick = {
-            viewModel.selectedPalette = Palette()
-            viewModel.selectedPaletteIndex = -1
-        }) {
+        Button(
+            onClick = {
+                viewModel.selectedPalette = Palette()
+                viewModel.selectedPaletteIndex = -1
+            },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 6.dp)
+        ) {
             Text("New Palette")
         }
     }
