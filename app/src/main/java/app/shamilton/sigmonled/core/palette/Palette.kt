@@ -1,7 +1,7 @@
 package app.shamilton.sigmonled.core.palette
 
 import app.shamilton.sigmonled.core.color.Color
-import app.shamilton.sigmonled.core.toByteExclude10
+import app.shamilton.sigmonled.extensions.toByteExclude10
 import kotlinx.serialization.Serializable
 
 /**

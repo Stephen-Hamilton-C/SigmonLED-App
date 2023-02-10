@@ -7,6 +7,7 @@ import app.shamilton.sigmonled.core.palette.DefaultPalette
 import app.shamilton.sigmonled.core.palette.Palette
 import com.badoo.reaktive.observable.subscribe
 import app.shamilton.sigmonled.core.palette.PaletteMode
+import app.shamilton.sigmonled.extensions.toByteExclude10
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.subject.publish.PublishSubject
 

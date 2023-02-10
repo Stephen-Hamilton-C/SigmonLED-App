@@ -1,7 +1,6 @@
 package app.shamilton.sigmonled.core.color
 
-import app.shamilton.sigmonled.core.toHex
-import app.shamilton.sigmonled.core.toHexPadded
+import app.shamilton.sigmonled.extensions.toHexPadded
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.serialization.Serializable

@@ -1,5 +1,7 @@
 package app.shamilton.sigmonled.core
 
+import app.shamilton.sigmonled.extensions.toHex
+import app.shamilton.sigmonled.extensions.toHexPadded
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

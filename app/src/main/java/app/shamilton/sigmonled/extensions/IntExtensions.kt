@@ -1,5 +1,6 @@
-package app.shamilton.sigmonled.core
+package app.shamilton.sigmonled.extensions
 
+import app.shamilton.sigmonled.core.Util
 import kotlin.math.abs
 
 /**
