@@ -7,6 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.badoo.reaktive.observable.subscribe
 
+// FIXME: This is probably a really bad memory leak
+// DeviceManager requires a Context, which this ViewModel is supposed to be outside of
+// So the ViewModel holds a ref to DeviceManager, which holds a ref to Context
+// I still need something like this so I'm not constantly making variables...
+// I need to research this
 class DeviceManagerViewModel(val deviceManager: DeviceManager) : ViewModel() {
 
     var connectedDevice by mutableStateOf(deviceManager.connectedDevice)
