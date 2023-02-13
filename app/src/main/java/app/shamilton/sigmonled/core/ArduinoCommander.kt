@@ -1,6 +1,5 @@
 package app.shamilton.sigmonled.core
 
-import androidx.activity.ComponentActivity
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 import app.shamilton.sigmonled.core.color.Color
 import app.shamilton.sigmonled.core.palette.DefaultPalette
@@ -11,8 +10,7 @@ import app.shamilton.sigmonled.extensions.toByteExclude10
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.subject.publish.PublishSubject
 
-class ArduinoCommander(activity: ComponentActivity) {
-    val deviceManager = DeviceManager(activity)
+class ArduinoCommander(val deviceManager: DeviceManager) {
     val onAutoConnectStateChanged = PublishSubject<AutoConnectState>()
     val isUploadingPalette: Boolean
         get() = _currentUploadTask?.isRunning ?: false

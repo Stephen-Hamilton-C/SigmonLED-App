@@ -1,38 +1,86 @@
 package app.shamilton.sigmonled
 
 import android.Manifest.permission
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import app.shamilton.sigmonled.ui.BluetoothErrorReporter
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.scaffold.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
+import com.badoo.reaktive.observable.subscribe
+import com.badoo.reaktive.subject.behavior.BehaviorSubject
 
 
 class MainActivity : ComponentActivity() {
 
-    private val commander: ArduinoCommander by lazy { ArduinoCommander(this) }
+    private var _commander: ArduinoCommander? = null
+    private var _bleErrorReporter: BluetoothErrorReporter? = null
+    private val _onCommanderReceived = BehaviorSubject<Boolean>(false)
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as BluetoothService.LocalBinder
+            _commander = ArduinoCommander(binder.deviceManager)
+            _bleErrorReporter = BluetoothErrorReporter(this@MainActivity, binder.deviceManager)
+            _onCommanderReceived.onNext(true)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            _commander = null
+            _bleErrorReporter?.close()
+            _bleErrorReporter = null
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        BluetoothErrorReporter(this, commander.deviceManager)
+        Intent(this, BluetoothService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+
         requestPermissions()
 
         setContent {
             SigmonLEDTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.primary,
-                ) {
-                    AppScaffold.Component(commander)
+                var ready by rememberSaveable { mutableStateOf(_commander != null) }
+                _onCommanderReceived.subscribe { ready = it }
+
+                if(ready) {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colors.primary,
+                    ) {
+                        _commander?.let { commander ->
+                            AppScaffold.Component(commander)
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
             }
         }
@@ -43,8 +91,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-
-        commander.deviceManager.scan()
+        _commander?.deviceManager?.scan()
     }
 
     override fun onRestart() {
@@ -53,9 +100,10 @@ class MainActivity : ComponentActivity() {
         // TODO: Autoconnect here.
         // Problem is, a BluetoothException is being thrown here
         // Maybe a race condition?
-        val devMan = commander.deviceManager
-        if(devMan.previousDevice != null) {
-            devMan.connect(devMan.previousDevice!!)
+        _commander?.deviceManager?.let { devMan ->
+            if (devMan.previousDevice != null) {
+                devMan.connect(devMan.previousDevice!!)
+            }
         }
     }
 
@@ -69,11 +117,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        commander.deviceManager.disconnect()
+        _commander?.deviceManager?.disconnect()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        unbindService(connection)
     }
 
     private fun requestPermissions() {
