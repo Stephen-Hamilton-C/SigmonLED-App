@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // TODO: Need to check these before the service can use them
         requestPermissions()
 
         Intent(this, BluetoothService::class.java).also { intent ->
