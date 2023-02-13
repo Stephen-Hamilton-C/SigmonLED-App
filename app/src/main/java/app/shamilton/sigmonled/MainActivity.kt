@@ -29,7 +29,6 @@ import com.badoo.reaktive.subject.behavior.BehaviorSubject
 
 
 class MainActivity : ComponentActivity() {
-
     private var _commander: ArduinoCommander? = null
     private var _bleErrorReporter: BluetoothErrorReporter? = null
     private val _onCommanderReceived = BehaviorSubject<Boolean>(false)

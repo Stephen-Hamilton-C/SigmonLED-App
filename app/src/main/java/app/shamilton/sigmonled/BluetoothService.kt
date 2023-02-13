@@ -9,21 +9,16 @@ import app.shamilton.sigmonled.core.bluetooth.DeviceManager
 class BluetoothService : Service() {
     private lateinit var deviceManager: DeviceManager
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        println("BluetoothService Lifecycle: onStartCommand")
+    override fun onBind(intent: Intent?): IBinder {
+        println("BluetoothService Lifecycle: onBind")
         deviceManager = DeviceManager(this)
-        return START_STICKY
+
+        return LocalBinder()
     }
 
     override fun onDestroy() {
         println("BluetoothService Lifecycle: onDestroy")
         deviceManager.close()
-    }
-
-    override fun onBind(intent: Intent?): IBinder {
-        println("BluetoothService Lifecycle: onBind")
-        deviceManager = DeviceManager(this)
-        return LocalBinder()
     }
 
     inner class LocalBinder : Binder() {

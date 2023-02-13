@@ -7,13 +7,13 @@ import com.badoo.reaktive.disposable.Disposable
 import com.badoo.reaktive.observable.subscribe
 
 class BluetoothErrorReporter(context: Context, deviceManager: DeviceManager) {
-    val bluetoothError: Disposable = deviceManager.onBluetoothError.subscribe {
+    private val _bluetoothError: Disposable = deviceManager.onBluetoothError.subscribe {
         val message = "Bluetooth Error (${it.errorCode}): ${it.message}"
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         println(message)
     }
 
     fun close() {
-        bluetoothError.dispose()
+        _bluetoothError.dispose()
     }
 }
