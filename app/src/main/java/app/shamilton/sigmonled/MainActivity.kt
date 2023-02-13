@@ -24,7 +24,9 @@ import app.shamilton.sigmonled.ui.BluetoothErrorReporter
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.scaffold.AppScaffold
 import app.shamilton.sigmonled.ui.theme.SigmonLEDTheme
+import com.badoo.reaktive.observable.filter
 import com.badoo.reaktive.observable.subscribe
+import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.subject.behavior.BehaviorSubject
 
 
@@ -51,34 +53,36 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        requestPermissions()
+
         Intent(this, BluetoothService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
-
-        requestPermissions()
 
         setContent {
             SigmonLEDTheme {
                 var ready by rememberSaveable { mutableStateOf(_commander != null) }
                 _onCommanderReceived.subscribe { ready = it }
 
-                if(ready) {
-                    // A surface container using the 'background' color from the theme
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colors.primary,
-                    ) {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.surface,
+                ) {
+                    if(ready) {
                         _commander?.let { commander ->
                             AppScaffold.Component(commander)
                         }
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxSize(0.25f)
+                                    .align(Alignment.Center)
+                            )
+                        }
                     }
                 }
             }
@@ -90,15 +94,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        _commander?.deviceManager?.scan()
+
+        _onCommanderReceived.filter { it }.take(1).subscribe {  ready ->
+            if(ready) {
+                _commander?.deviceManager?.scan()
+            }
+        }
     }
 
     override fun onRestart() {
         super.onRestart()
 
-        // TODO: Autoconnect here.
-        // Problem is, a BluetoothException is being thrown here
-        // Maybe a race condition?
         _commander?.deviceManager?.let { devMan ->
             if (devMan.previousDevice != null) {
                 devMan.connect(devMan.previousDevice!!)
