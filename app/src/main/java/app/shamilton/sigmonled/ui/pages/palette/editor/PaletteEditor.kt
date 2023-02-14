@@ -22,38 +22,73 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
         if(currentColorIndex < 0) {
             // No color currently selected, show the list of colors
             Column() {
-                // Name
-                OutlinedTextField(
-                    label = { Text("Name") },
-                    value = name,
-                    onValueChange = { name = it },
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
+                Column(
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 12.dp)
-                        .defaultMinSize(minWidth = 1.dp)
-                )
+                        .weight(1f)
+                ) {
+                    // Name
+                    OutlinedTextField(
+                        label = { Text("Name") },
+                        value = name,
+                        onValueChange = { name = it },
+                        singleLine = true,
+                        textStyle = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 12.dp)
+                            .defaultMinSize(minWidth = 1.dp)
+                    )
 
-                // Color list
-                PaletteColorList(
-                    palette = selectedPalette,
-                    onColorIndexSelected = { currentColorIndex = it },
-                    onExpand = {
-                        viewModel.selectedPalette = selectedPalette.expand()
-                    },
-                    onShrink = {
-                        viewModel.selectedPalette = selectedPalette.shrink()
-                    }
-                )
+                    // Color list
+                    PaletteColorList(
+                        palette = selectedPalette,
+                        onColorIndexSelected = { currentColorIndex = it },
+                    )
+                }
 
-                // Save/Exit buttons
+                // Expand/Shrink buttons
                 Row() {
-                    // Save palette button
-                    val currentContext = LocalContext.current
                     Button(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
+                            .padding(horizontal = 6.dp),
+                        onClick = {
+                            viewModel.selectedPalette = selectedPalette.expand()
+                        },
+                        enabled = selectedPalette.canExpand,
+                    ) {
+                        Text("Expand")
+                    }
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .padding(horizontal = 6.dp),
+                        onClick = {
+                            viewModel.selectedPalette = selectedPalette.shrink()
+                        },
+                        enabled = selectedPalette.canShrink,
+                    ) {
+                        Text("Shrink")
+                    }
+                }
+
+                // Save/Exit buttons
+                Row() {
+                    val currentContext = LocalContext.current
+                    // Exit and discard changes button
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(6.dp),
+                        onClick = { viewModel.selectedPalette = null },
+                    ) {
+                        Text("Back")
+                    }
+
+                    // Save palette button
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
                             .padding(6.dp),
                         onClick = {
                             // Change name first if it has been changed
@@ -75,17 +110,7 @@ fun PaletteEditor(viewModel: PaletteEditorModel) {
                             viewModel.save(currentContext)
                         },
                     ) {
-                        Text("Save")
-                    }
-
-                    // Exit and discard changes button
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .padding(6.dp),
-                        onClick = { viewModel.selectedPalette = null },
-                    ) {
-                        Text("Exit")
+                        Text("Save Palette")
                     }
                 }
             }
