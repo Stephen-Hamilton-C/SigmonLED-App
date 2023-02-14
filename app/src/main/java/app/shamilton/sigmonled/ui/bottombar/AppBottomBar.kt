@@ -3,8 +3,8 @@ package app.shamilton.sigmonled.ui.bottombar
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.bluetooth.DeviceManager
@@ -28,11 +28,13 @@ object AppBottomBar {
         val viewModel: DeviceManagerViewModel =
             viewModel(factory = DeviceManagerViewModel.Factory(deviceManager))
 
-        var currentTabIndex by remember { mutableStateOf(0) }
-        var currentPage by remember { mutableStateOf(AppScaffold.currentPage) }
+        var currentTabIndex by rememberSaveable { mutableStateOf(0) }
+        var currentPage by rememberSaveable { mutableStateOf(AppScaffold.currentPage) }
         AppScaffold.onPageNavigation.subscribe {
-            currentPage = it
-            currentTabIndex = 0
+            if(currentPage != it) {
+                currentPage = it
+                currentTabIndex = 0
+            }
         }
 
         val tabs = BottomTab.values().filter { it.parentPage == currentPage }
