@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.shamilton.sigmonled.core.ArduinoCommander
+import app.shamilton.sigmonled.ui.bottombar.AppBottomBar
 import app.shamilton.sigmonled.ui.pages.Pages
 import app.shamilton.sigmonled.ui.pages.about.AboutPage
 import app.shamilton.sigmonled.ui.pages.devices.DevicesPage
@@ -51,6 +52,7 @@ object AppScaffold {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { AppTopBar(commander) },
+            bottomBar = { AppBottomBar.Component(commander.deviceManager) },
             drawerContent = { Menu(navController, commander.deviceManager) },
             floatingActionButton = { FloatingActionButtons(commander = commander) },
             floatingActionButtonPosition = FabPosition.End,
