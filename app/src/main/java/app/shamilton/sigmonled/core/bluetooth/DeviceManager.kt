@@ -373,6 +373,7 @@ class DeviceManager(context: Context) {
             // This means e.g. enabling notifications, setting notification callbacks,
             // sometimes writing something to some Control Point.
             // Kotlin projects should not use suspend methods here, which require a scope.
+            deviceManager.write(byteArrayOf('\n'.code.toByte()))
             println("Device initialized.")
         }
 
