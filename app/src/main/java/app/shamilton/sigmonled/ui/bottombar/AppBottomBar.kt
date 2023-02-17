@@ -42,6 +42,11 @@ object AppBottomBar {
         fun isTabEnabled(tab: BottomTab) = !tab.disableOnDisconnect || viewModel.isConnected
 
         fun validateTabs() {
+            if(tabs.isEmpty()) return
+            if(tabs.size <= currentTabIndex) {
+                currentTabIndex = 0
+            }
+
             tabs[currentTabIndex].let { activeTab ->
                 if(isTabEnabled(activeTab)) {
                     currentTab = activeTab
