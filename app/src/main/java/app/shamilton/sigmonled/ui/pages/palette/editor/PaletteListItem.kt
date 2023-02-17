@@ -30,7 +30,7 @@ fun PaletteListItem(
 ) {
 
     fun uploadClicked() {
-        commander.setPalette(palette)
+        commander.uploadPalette(palette)
     }
 
     fun editClicked() {

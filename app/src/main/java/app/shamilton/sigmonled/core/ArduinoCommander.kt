@@ -22,7 +22,7 @@ class ArduinoCommander(val deviceManager: DeviceManager) {
     private val terminator: Byte = '\n'.code.toByte()
     private var _currentUploadTask: PaletteUploadTask? = null
 
-    fun setPalette(palette: Palette, onFinished: () -> Unit = {}) {
+    fun uploadPalette(palette: Palette, onFinished: () -> Unit = {}) {
         if(_currentUploadTask?.isRunning == true) {
             _currentUploadTask?.cancel()
         }
