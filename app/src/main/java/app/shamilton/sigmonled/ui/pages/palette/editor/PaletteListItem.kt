@@ -35,11 +35,7 @@ fun PaletteListItem(
     val context = LocalContext.current
 
     fun uploadClicked() {
-        Toast.makeText(
-            context,
-            "Uploading ${palette.name}...",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(context, "Uploading ${palette.name}...", Toast.LENGTH_SHORT).show()
         commander.uploadPalette(palette) {
             AppScaffold.scope.launch {
                 Toast.makeText(context, "Finished uploading.", Toast.LENGTH_SHORT).show()
