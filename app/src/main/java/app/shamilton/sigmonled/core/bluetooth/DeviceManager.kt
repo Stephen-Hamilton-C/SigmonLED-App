@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED
 import android.content.Context
 import android.os.ParcelUuid
-import androidx.activity.ComponentActivity
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.subject.publish.PublishSubject
 import no.nordicsemi.android.ble.BleManager
@@ -18,8 +17,7 @@ import kotlin.concurrent.schedule
 /**
  * Handles all low-level Bluetooth Low Energy connections
  */
-class DeviceManager(activity: ComponentActivity) {
-
+class DeviceManager(context: Context) {
     // Subjects
     /**
      * Called when a scan is started`
@@ -112,7 +110,7 @@ class DeviceManager(activity: ComponentActivity) {
     private val scanner = BluetoothLeScannerCompat.getScanner()
     private val scannerCallback = DeviceManagerScanCallback(this)
     private val _discoveredDevices = mutableSetOf<BluetoothDevice>()
-    private val bleManager = InternalManager(this, activity)
+    private var bleManager = InternalManager(this, context)
     private var scanningTask: TimerTask? = null
 
     // UUIDs
@@ -202,7 +200,6 @@ class DeviceManager(activity: ComponentActivity) {
      * Parameter is true if connection completed successfully.
      * @param andThen Function to run after the device has been connected
      */
-    // TODO: There certainly has to be something in Reaktive or Java util for the equivalent of an rxjs Promise
     fun connect(device: BluetoothDevice, andThen: ((success: Boolean) -> Unit)? = null) {
         bleManager.connect(device)
             .retry(3, 1000)
@@ -288,6 +285,10 @@ class DeviceManager(activity: ComponentActivity) {
         bleManager.write(bytes)
     }
 
+    fun close() {
+        bleManager.close()
+    }
+
     /**
      * Callback methods for scanning
      */
@@ -334,43 +335,6 @@ class DeviceManager(activity: ComponentActivity) {
      */
     private class InternalManager(val deviceManager: DeviceManager, context: Context) : BleManager(context) {
 
-        // This is a really cursed solution to a really cursed problem
-        // So because this class extends BleManager, BleManager must be constructed
-        // before this class is constructed. While BleManager is being constructed, it calls
-        // getGattCallback() at some point. This class then goes "Oh! I have an override! Use me!"
-        // However, because this class isn't constructed yet, deviceManager, a non-nullable property,
-        // is null. Which then gets passed to the MyGattCallbackImpl constructor, which has a
-        // non-nullable property for deviceManager. It then freaks out and throws.
-        // So, to solve this, I have here a list of callbacks that were retrieved before this class
-        // was constructed. When retrieving a callback, it first checks if deviceManager is null.
-        // If it is, it then adds the retrieved callback to the list before returning that callback.
-        // Finally, when the class is constructed, it checks if there were any callbacks retrieved.
-        // If there were, then it goes through each of them and sets the now-initialized
-        // deviceManager property.
-        private var preconstructedCallbacks: MutableList<DeviceManagerGattCallback>? = null
-        init {
-            if(preconstructedCallbacks != null) {
-                for(callback in preconstructedCallbacks!!) {
-                    callback.deviceManager = deviceManager
-                }
-                preconstructedCallbacks = null
-            }
-        }
-
-        override fun getGattCallback(): BleManagerGattCallback {
-            val callback = DeviceManagerGattCallback(deviceManager)
-
-            // This, in fact, can be null. Read the wall of comments above
-            @Suppress("ConstantConditionIf")
-            if(deviceManager == null) {
-                if(preconstructedCallbacks == null)
-                    preconstructedCallbacks = mutableListOf()
-                preconstructedCallbacks!!.add(callback)
-            }
-
-            return callback
-        }
-
         /**
          * Writes to the command Characteristic
          */
@@ -391,47 +355,35 @@ class DeviceManager(activity: ComponentActivity) {
                 .enqueue()
         }
 
-        @Deprecated("Implement all methods directly in your manager")
-        private class DeviceManagerGattCallback(var deviceManager: DeviceManager?) : BleManagerGattCallback() {
-
-            // I really don't wanna type !! all the time
-            val devMan: DeviceManager
-                get() = deviceManager!!
-
-            @Deprecated("Implement all methods directly in your manager")
-            override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
-                // Here get instances of your characteristics.
-                // Return false if a required service has not been discovered.
-                println("Checking for required service...")
-                val serialService = gatt.getService(devMan.serviceUUID)
-                if (serialService != null) {
-                    println("Found service")
-                    devMan.controlPoint = serialService.getCharacteristic(devMan.charUUID)
-                }
-                println("Returning ${devMan.controlPoint != null}")
-                return devMan.controlPoint != null
+        override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
+            // Here get instances of your characteristics.
+            // Return false if a required service has not been discovered.
+            println("Checking for required service...")
+            val serialService = gatt.getService(deviceManager.serviceUUID)
+            if (serialService != null) {
+                println("Found service")
+                deviceManager.controlPoint = serialService.getCharacteristic(deviceManager.charUUID)
             }
+            println("Returning ${deviceManager.controlPoint != null}")
+            return deviceManager.controlPoint != null
+        }
 
-            @Deprecated("Implement all methods directly in your manager")
-            override fun initialize() {
-                // Initialize your device.
-                // This means e.g. enabling notifications, setting notification callbacks,
-                // sometimes writing something to some Control Point.
-                // Kotlin projects should not use suspend methods here, which require a scope.
-                println("Device initialized.")
-                // Send the "nevermind" command to reset state
-                devMan.write("x")
-            }
+        override fun initialize() {
+            // Initialize your device.
+            // This means e.g. enabling notifications, setting notification callbacks,
+            // sometimes writing something to some Control Point.
+            // Kotlin projects should not use suspend methods here, which require a scope.
+            deviceManager.write(byteArrayOf('\n'.code.toByte()))
+            println("Device initialized.")
+        }
 
-            @Deprecated("Implement all methods directly in your manager")
-            override fun onServicesInvalidated() {
-                // This method is called when the services get invalidated, i.e. when the device
-                // disconnects.
-                // References to characteristics should be nullified here.
-                println("Services invalidated.")
-                devMan.controlPoint = null
-                devMan.connectedDevice = null
-            }
+        override fun onServicesInvalidated() {
+            // This method is called when the services get invalidated, i.e. when the device
+            // disconnects.
+            // References to characteristics should be nullified here.
+            println("Services invalidated.")
+            deviceManager.controlPoint = null
+            deviceManager.connectedDevice = null
         }
     }
 }

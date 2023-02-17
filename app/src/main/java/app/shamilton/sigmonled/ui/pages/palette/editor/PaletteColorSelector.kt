@@ -1,7 +1,6 @@
 package app.shamilton.sigmonled.ui.pages.palette.editor
 
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -13,22 +12,40 @@ import app.shamilton.sigmonled.ui.picker.ColorPicker
 
 @Composable
 fun PaletteColorSelector(defaultColor: Color = Color.BLACK, onSave: (Color) -> Unit, onExit: () -> Unit) {
-    var currentColor: Color by rememberSaveable(stateSaver = Color.Saver) { mutableStateOf(defaultColor) }
-    ColorPicker(
-        modifier = Modifier
-            .fillMaxHeight(0.75f)
-            .padding(12.dp),
-        color = currentColor,
-        onColorChanged = { color ->
-            currentColor = color
-        },
-    )
-    Button(onClick = {
-        onSave(currentColor)
-    }) {
-        Text("Save")
-    }
-    Button(onClick = onExit) {
-        Text("Exit")
+    Column(
+        modifier = Modifier.padding(6.dp)
+    ) {
+        var currentColor: Color by rememberSaveable(stateSaver = Color.Saver) { mutableStateOf(defaultColor) }
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            ColorPicker(
+                modifier = Modifier
+                    .fillMaxHeight(0.75f)
+                    .padding(12.dp),
+                color = currentColor,
+                onColorChanged = { color ->
+                    currentColor = color
+                },
+            )
+        }
+        Row() {
+            Button(
+                onClick = onExit,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(end = 6.dp)
+            ) {
+                Text("Back")
+            }
+            Button(
+                onClick = { onSave(currentColor) },
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .padding(start = 6.dp)
+            ) {
+                Text("Save Color")
+            }
+        }
     }
 }

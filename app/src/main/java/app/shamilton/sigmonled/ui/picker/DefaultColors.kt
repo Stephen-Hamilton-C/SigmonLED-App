@@ -38,9 +38,15 @@ fun DefaultColors(
                 .padding(top = 6.dp)
         ) {
             defaultColors.forEach {
+                val colorMod = if(it != defaultColors.last()) {
+                    Modifier.padding(end = 4.dp)
+                } else {
+                    Modifier
+                }
                 ColorButton(
                     onClick = { onColorSelect(it) },
                     color = it,
+                    modifier = colorMod
                 )
             }
         }
