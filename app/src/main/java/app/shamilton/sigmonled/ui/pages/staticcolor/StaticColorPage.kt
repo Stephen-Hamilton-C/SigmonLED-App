@@ -20,7 +20,7 @@ fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
 
     if(!timerCreated) {
         timerCreated = true
-        timer(period = 10L) {
+        timer(period = 50L) {
             if(colorChanged) {
                 colorChanged = false
                 commander.setColor(currentColor)
@@ -36,8 +36,8 @@ fun StaticColorPage(modifier: Modifier, commander: ArduinoCommander) {
         ColorPicker(
             color = currentColor,
             onColorChanged = { color ->
-                colorChanged = true
                 currentColor = color
+                colorChanged = true
             }
         )
     }
