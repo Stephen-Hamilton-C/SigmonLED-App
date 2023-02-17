@@ -12,6 +12,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.core.bluetooth.DeviceManagerViewModel
 import app.shamilton.sigmonled.core.palette.Palette
+import app.shamilton.sigmonled.ui.scaffold.AppScaffold
+import kotlinx.coroutines.launch
 
 /**
  * The UI element shown for each custom palette
@@ -30,9 +32,19 @@ fun PaletteListItem(
     commander: ArduinoCommander,
     onDelete: () -> Unit = {},
 ) {
+    val context = LocalContext.current
 
     fun uploadClicked() {
-        commander.uploadPalette(palette)
+        Toast.makeText(
+            context,
+            "Uploading ${palette.name}...",
+            Toast.LENGTH_SHORT
+        ).show()
+        commander.uploadPalette(palette) {
+            AppScaffold.scope.launch {
+                Toast.makeText(context, "Finished uploading.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     fun editClicked() {
@@ -88,7 +100,6 @@ fun PaletteListItem(
                 }
 
                 // Export button
-                val context = LocalContext.current
                 DropdownMenuItem(onClick = {
                     expanded = false
                     // TODO: Implement exporting for custom palettes

@@ -16,7 +16,8 @@ class PaletteUploadTask(private val deviceManager: DeviceManager, val palette: P
         isRunning = true
         val bytes = byteArrayOf('\n'.code.toByte(), 'C'.code.toByte())
         deviceManager.write(bytes)
-        _timer.schedule(10, 25) {
+
+        _timer.schedule(10, 60) {
             taskLoop(onFinished)
         }
     }
@@ -35,9 +36,7 @@ class PaletteUploadTask(private val deviceManager: DeviceManager, val palette: P
     private fun taskLoop(onFinished: () -> Unit) {
         if(_currentIndex < _command.size) {
             val nextBurst = _command.copyOfRange(_currentIndex, _currentIndex+3)
-            _currentIndex += 6
-
-            println("Sending $nextBurst, remaining command: ${_command.copyOfRange(_currentIndex, _command.size)}")
+            _currentIndex += 3
 
             deviceManager.write(nextBurst)
         } else {
