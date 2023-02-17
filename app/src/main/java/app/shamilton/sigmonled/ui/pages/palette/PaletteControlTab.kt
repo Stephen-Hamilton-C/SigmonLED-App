@@ -35,11 +35,11 @@ fun PaletteControlTab(commander: ArduinoCommander) {
         var brightness by rememberSaveable  { mutableStateOf(255) }
 
         fun apply() {
+            commander.setPalette(selectedPalette)
+            commander.setPaletteMode(paletteMode)
             commander.setBlending(linearBlending)
             commander.setBrightness(brightness)
             commander.setDelay(delay)
-            commander.setPalette(selectedPalette)
-            commander.setPaletteMode(paletteMode)
             commander.setStretch(stretch)
         }
 
@@ -47,7 +47,10 @@ fun PaletteControlTab(commander: ArduinoCommander) {
         ListOption(
             label = { Text("Palette") },
             value = selectedPalette.displayName,
-            onValueChange = { selectedPalette = DefaultPalette.fromDisplayName(it) },
+            onValueChange = {
+                selectedPalette = DefaultPalette.fromDisplayName(it)
+                commander.setPalette(selectedPalette)
+            },
             possibleValues = DefaultPalette.values().map { it.displayName },
         )
         Divider()
@@ -56,7 +59,10 @@ fun PaletteControlTab(commander: ArduinoCommander) {
         ListOption(
             label = { Text("Palette Mode") },
             value = paletteMode.displayName,
-            onValueChange = { paletteMode = PaletteMode.fromDisplayName(it) },
+            onValueChange = {
+                paletteMode = PaletteMode.fromDisplayName(it)
+                commander.setPaletteMode(paletteMode)
+            },
             possibleValues = PaletteMode.values().map { it.displayName },
         )
         Divider()
@@ -72,7 +78,10 @@ fun PaletteControlTab(commander: ArduinoCommander) {
             modifier = Modifier.toggleable(
                 role = Role.Switch,
                 value = linearBlending,
-                onValueChange = { linearBlending = it }
+                onValueChange = {
+                    linearBlending = it
+                    commander.setBlending(linearBlending)
+                }
             )
         )
         Divider()
