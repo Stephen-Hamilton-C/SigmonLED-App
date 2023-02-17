@@ -1,11 +1,9 @@
 package app.shamilton.sigmonled
 
-import android.Manifest.permission
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.ComponentActivity
@@ -19,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
 import app.shamilton.sigmonled.ui.BluetoothErrorReporter
 import app.shamilton.sigmonled.core.ArduinoCommander
 import app.shamilton.sigmonled.ui.scaffold.AppScaffold
@@ -33,7 +30,8 @@ import com.badoo.reaktive.subject.behavior.BehaviorSubject
 class MainActivity : ComponentActivity() {
     private var _commander: ArduinoCommander? = null
     private var _bleErrorReporter: BluetoothErrorReporter? = null
-    private val _onCommanderReceived = BehaviorSubject<Boolean>(false)
+    private val _onCommanderReceived = BehaviorSubject(false)
+    private val _permissionHandler = PermissionHandler(this)
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -50,14 +48,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun bindToBLEService() {
+        Intent(this, BluetoothService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Need to check these before the service can use them
-        requestPermissions()
-
-        Intent(this, BluetoothService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        // Check permissions
+        if(_permissionHandler.allPermissionsGranted) {
+            // Permissions are good, start the service
+            bindToBLEService()
+        } else {
+            // Ask the user for permissions
+            _permissionHandler.requestPermissions() {
+                bindToBLEService()
+            }
         }
 
         setContent {
@@ -88,9 +96,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-        // TODO: Autoconnect here
-        // Same BluetoothException as onRestart.
     }
 
     override fun onStart() {
@@ -98,19 +103,13 @@ class MainActivity : ComponentActivity() {
 
         _onCommanderReceived.filter { it }.take(1).subscribe {  ready ->
             if(ready) {
-                _commander?.deviceManager?.scan()
+                _commander?.autoConnect()
             }
         }
     }
 
     override fun onRestart() {
         super.onRestart()
-
-        _commander?.deviceManager?.let { devMan ->
-            if (devMan.previousDevice != null) {
-                devMan.connect(devMan.previousDevice!!)
-            }
-        }
     }
 
     override fun onResume() {
@@ -128,21 +127,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(connection)
-    }
-
-    private fun requestPermissions() {
-        val permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                permission.BLUETOOTH,
-                permission.BLUETOOTH_ADMIN,
-                permission.BLUETOOTH_SCAN,
-                permission.BLUETOOTH_CONNECT,
-                permission.ACCESS_FINE_LOCATION,
-            )
-        } else {
-            arrayOf(permission.BLUETOOTH, permission.BLUETOOTH_ADMIN, permission.ACCESS_FINE_LOCATION)
+        if(_commander != null) {
+            unbindService(connection)
         }
-        ActivityCompat.requestPermissions(this, permissions, 1)
     }
 }
